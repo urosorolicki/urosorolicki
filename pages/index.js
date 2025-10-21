@@ -333,6 +333,7 @@ export default function PortfolioTerminal() {
   const [lines, setLines] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [inputDisabled, setInputDisabled] = useState(false);
+  const [showTouchHelper, setShowTouchHelper] = useState(false);
   const idRef = useRef(0);
   const scrollerRef = useRef(null);
   const inputRef = useRef(null);
@@ -344,6 +345,16 @@ export default function PortfolioTerminal() {
       if (saved) {
         setHistory(JSON.parse(saved));
       }
+    }
+  }, [mounted]);
+
+  // Detect mobile/touch devices
+  useEffect(() => {
+    if (mounted && typeof window !== "undefined") {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                      ('ontouchstart' in window) || 
+                      (window.innerWidth <= 768);
+      setShowTouchHelper(isMobile);
     }
   }, [mounted]);
 
