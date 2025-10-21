@@ -800,51 +800,34 @@ ${p.desc}`).join("\n\n")}`;
             ))}
 
             {/* input line */}
-            <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               <Prompt theme={theme} />
-              <div style={{ position: 'relative', flex: '1', display: 'flex', alignItems: 'baseline' }}>
-                <span style={{
+              <input
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={onKeyDown}
+                disabled={inputDisabled}
+                style={{
+                  flex: '1',
+                  backgroundColor: 'transparent',
+                  outline: 'none',
+                  border: 'none',
                   color: '#ffffff',
                   fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
                   fontSize: '14px',
                   lineHeight: '1.3',
                   fontWeight: 'normal',
-                  whiteSpace: 'pre-wrap',
+                  padding: '0',
+                  margin: '0',
+                  caretColor: '#4ade80',
                   WebkitFontSmoothing: 'antialiased',
-                  MozOsxFontSmoothing: 'grayscale'
-                }}>
-                  {input}
-                </span>
-                {!inputDisabled && <Caret theme={theme} />}
-                {inputDisabled && <span style={{ color: '#666' }}>_</span>}
-                <input
-                  ref={inputRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={onKeyDown}
-                  disabled={inputDisabled}
-                  style={{
-                    position: 'absolute',
-                    top: '0',
-                    left: '0',
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'transparent',
-                    outline: 'none',
-                    border: 'none',
-                    color: 'transparent',
-                    fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
-                    fontSize: '14px',
-                    lineHeight: '1.3',
-                    caretColor: 'transparent',
-                    padding: '0',
-                    margin: '0',
-                    opacity: 0
-                  }}
-                  autoFocus
-                  aria-label="terminal input"
-                />
-              </div>
+                  MozOsxFontSmoothing: 'grayscale',
+                  opacity: inputDisabled ? 0.5 : 1
+                }}
+                autoFocus
+                aria-label="terminal input"
+              />
             </div>
           </div>
 
