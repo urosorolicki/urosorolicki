@@ -802,7 +802,21 @@ ${p.desc}`).join("\n\n")}`;
             {/* input line */}
             <div style={{ display: 'flex', alignItems: 'flex-start' }}>
               <Prompt theme={theme} />
-              <div style={{ position: 'relative', flex: '1' }}>
+              <div style={{ position: 'relative', flex: '1', display: 'flex', alignItems: 'baseline' }}>
+                <span style={{
+                  color: '#ffffff',
+                  fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
+                  fontSize: '14px',
+                  lineHeight: '1.3',
+                  fontWeight: 'normal',
+                  whiteSpace: 'pre-wrap',
+                  WebkitFontSmoothing: 'antialiased',
+                  MozOsxFontSmoothing: 'grayscale'
+                }}>
+                  {input}
+                </span>
+                {!inputDisabled && <Caret theme={theme} />}
+                {inputDisabled && <span style={{ color: '#666' }}>_</span>}
                 <input
                   ref={inputRef}
                   value={input}
@@ -810,39 +824,26 @@ ${p.desc}`).join("\n\n")}`;
                   onKeyDown={onKeyDown}
                   disabled={inputDisabled}
                   style={{
+                    position: 'absolute',
+                    top: '0',
+                    left: '0',
                     width: '100%',
+                    height: '100%',
                     backgroundColor: 'transparent',
                     outline: 'none',
                     border: 'none',
                     color: 'transparent',
                     fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
                     fontSize: '14px',
+                    lineHeight: '1.3',
                     caretColor: 'transparent',
-                    opacity: inputDisabled ? 0.5 : 1
+                    padding: '0',
+                    margin: '0',
+                    opacity: 0
                   }}
                   autoFocus
                   aria-label="terminal input"
                 />
-                <div style={{
-                  pointerEvents: 'none',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-words',
-                  color: '#ffffff',
-                  fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
-                  fontSize: '14px',
-                  fontWeight: 'normal',
-                  WebkitFontSmoothing: 'antialiased',
-                  MozOsxFontSmoothing: 'grayscale'
-                }}>
-                  {input}
-                  {!inputDisabled && <Caret theme={theme} />}
-                  {inputDisabled && <span style={{ color: '#666' }}>_</span>}
-                </div>
               </div>
             </div>
           </div>
