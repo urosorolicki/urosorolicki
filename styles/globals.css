@@ -8,6 +8,9 @@ body {
   font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
   background: #000;
   color: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .terminal {
@@ -16,6 +19,9 @@ body {
   line-height: 1.2;
   color: #ffffff;
   background-color: #000000;
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @keyframes blink {

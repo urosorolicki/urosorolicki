@@ -779,7 +779,10 @@ ${p.desc}`).join("\n\n")}`;
               color: '#ffffff',
               fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
               fontSize: '14px',
-              lineHeight: '1.3'
+              lineHeight: '1.3',
+              fontWeight: 'normal',
+              WebkitFontSmoothing: 'antialiased',
+              MozOsxFontSmoothing: 'grayscale'
             }}
           >
             {lines.map((l) => (
@@ -831,7 +834,10 @@ ${p.desc}`).join("\n\n")}`;
                   wordBreak: 'break-words',
                   color: '#ffffff',
                   fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
-                  fontSize: '14px'
+                  fontSize: '14px',
+                  fontWeight: 'normal',
+                  WebkitFontSmoothing: 'antialiased',
+                  MozOsxFontSmoothing: 'grayscale'
                 }}>
                   {input}
                   {!inputDisabled && <Caret theme={theme} />}
