@@ -100,6 +100,13 @@ const TypeWriter = ({ text, speed = 30, onComplete, className = "" }) => {
       return;
     }
 
+    // If text is not a string (JSX element), render directly without typewriter
+    if (typeof text !== 'string') {
+      setIsComplete(true);
+      onComplete?.();
+      return;
+    }
+
     let currentIndex = 0;
     const timer = setInterval(() => {
       if (currentIndex < text.length) {
@@ -115,17 +122,14 @@ const TypeWriter = ({ text, speed = 30, onComplete, className = "" }) => {
     return () => clearInterval(timer);
   }, [text, speed, onComplete]);
 
+  // If text is JSX element, render it directly
   if (typeof text !== 'string') {
-    // If text is JSX/component, render it directly
-    useEffect(() => {
-      onComplete?.();
-    }, [onComplete]);
     return <div className={className}>{text}</div>;
   }
 
   return (
     <div className={className}>
-      {displayText}
+      <span className="whitespace-pre-wrap">{displayText}</span>
       {!isComplete && <span className="animate-pulse">|</span>}
     </div>
   );
@@ -389,18 +393,52 @@ export default function PortfolioTerminal() {
         const file = args[0];
         switch (file) {
           case "skills.txt":
-            return renderSkills();
+            // Return plain text version of skills
+            const skillsText = Object.entries(PROFILE.skills)
+              .map(([category, skills]) => `${category.replace("_", "/")}: ${skills.join(", ")}`)
+              .join("\n");
+            return <pre className="whitespace-pre-wrap">{skillsText}</pre>;
+            
           case "experience.json":
-            return <pre className="text-xs overflow-auto">{JSON.stringify(PROFILE.experience, null, 2)}</pre>;
+            return <pre className="text-xs overflow-auto whitespace-pre-wrap">{JSON.stringify(PROFILE.experience, null, 2)}</pre>;
+            
           case "README.md":
-            return (
-              <div>
-                <h1 className="text-xl font-bold mb-2"># {PROFILE.name}</h1>
-                <p>{PROFILE.summary}</p>
-                <p className="mt-2">## Quick Start</p>
-                <p>Type `help` to see available commands.</p>
-              </div>
-            );
+            const readmeText = `# ${PROFILE.name}
+
+${PROFILE.summary}
+
+## Quick Start
+Type \`help\` to see available commands.
+
+## Skills
+${Object.entries(PROFILE.skills).map(([k, v]) => `- ${k.replace("_", "/")}: ${v.join(", ")}`).join("\n")}
+
+## Contact
+- Email: ${PROFILE.email}
+- Phone: ${PROFILE.phone}
+- Location: ${PROFILE.location}`;
+            return <pre className="whitespace-pre-wrap">{readmeText}</pre>;
+            
+          case "contacts.vcf":
+            const vcfText = `BEGIN:VCARD
+VERSION:3.0
+FN:${PROFILE.name}
+ORG:${PROFILE.title}
+EMAIL:${PROFILE.email}
+TEL:${PROFILE.phone}
+ADR:;;${PROFILE.location};;;;
+URL:${PROFILE.github}
+URL:${PROFILE.linkedin}
+END:VCARD`;
+            return <pre className="whitespace-pre-wrap">{vcfText}</pre>;
+            
+          case "projects.md":
+            const projectsText = `# Projects
+
+${PROFILE.projects.map(p => `## ${p.name}
+${p.desc}`).join("\n\n")}`;
+            return <pre className="whitespace-pre-wrap">{projectsText}</pre>;
+            
           default:
             return <div>cat: {file}: No such file or directory</div>;
         }
@@ -560,8 +598,8 @@ export default function PortfolioTerminal() {
     if (fn) {
       const output = fn(args);
       if (output) {
-        // Use typewriter for certain commands
-        const useTypewriter = ['about', 'quote', 'cat'].includes(command);
+        // Use typewriter for text-based commands only
+        const useTypewriter = ['about', 'quote'].includes(command);
         pushOutput(output, useTypewriter);
       }
     } else {
@@ -669,7 +707,7 @@ export default function PortfolioTerminal() {
           </div>
           <button
             onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-            className="inline-flex items-center gap-2 rounded-xl border border-zinc-800/10 dark:border-zinc-100/10 px-3 py-1.5 text-sm hover:bg-zinc-800/5 dark:hover:bg-white/5"
+            className="inline-flex items-center gap-2 rounded-xl border border-zinc-800/10 dark:border-zinc-100/10 px-3 py-1.5 text-sm hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors"
           >
             {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />} Theme
           </button>
@@ -677,13 +715,13 @@ export default function PortfolioTerminal() {
 
         {/* Terminal window */}
         <div className="mx-auto max-w-4xl px-2 sm:px-4 pb-10">
-          <div className="rounded-2xl border border-zinc-800/10 dark:border-white/10 bg-white/70 dark:bg-zinc-950/70 shadow-xl backdrop-blur">
+          <div className="rounded-2xl border border-zinc-800/10 dark:border-white/10 bg-white/80 dark:bg-zinc-950/80 shadow-xl">
             {/* window chrome */}
-            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 border-b border-zinc-800/10 dark:border-white/10">
+            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 border-b border-zinc-800/10 dark:border-white/10 bg-zinc-100/50 dark:bg-zinc-800/30 rounded-t-2xl">
               <div className="flex gap-1.5 sm:gap-2">
-                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400/90"></span>
-                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-400/90"></span>
-                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-400/90"></span>
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400"></span>
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-400"></span>
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-400"></span>
               </div>
               <div className="ml-2 text-xs sm:text-sm text-zinc-500 truncate">
                 {PROFILE.name.toLowerCase().replaceAll(" ", "-")}:~/portfolio — zsh
@@ -694,7 +732,11 @@ export default function PortfolioTerminal() {
             <div
               ref={scrollerRef}
               onClick={handleTerminalClick}
-              className="h-[50vh] sm:h-[60vh] lg:h-[65vh] overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 font-mono text-xs sm:text-sm cursor-text"
+              className="terminal-content h-[50vh] sm:h-[60vh] lg:h-[65vh] overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 text-xs sm:text-sm cursor-text bg-white dark:bg-zinc-950"
+              style={{ 
+                scrollBehavior: 'smooth',
+                WebkitOverflowScrolling: 'touch'
+              }}
             >
               <AnimatePresence initial={false}>
                 {lines.map((l) => (
@@ -749,16 +791,16 @@ export default function PortfolioTerminal() {
 
           {/* Quick links under terminal */}
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-4 text-xs sm:text-sm">
-            <a className="inline-flex items-center gap-1.5 underline touch-manipulation" href={PROFILE.github} target="_blank" rel="noreferrer">
+            <a className="inline-flex items-center gap-1.5 underline hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors" href={PROFILE.github} target="_blank" rel="noreferrer">
               <Github className="w-3 h-3 sm:w-4 sm:h-4" /> GitHub
             </a>
-            <a className="inline-flex items-center gap-1.5 underline touch-manipulation" href={PROFILE.linkedin} target="_blank" rel="noreferrer">
+            <a className="inline-flex items-center gap-1.5 underline hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors" href={PROFILE.linkedin} target="_blank" rel="noreferrer">
               <Linkedin className="w-3 h-3 sm:w-4 sm:h-4" /> LinkedIn
             </a>
-            <a className="inline-flex items-center gap-1.5 underline touch-manipulation" href={`mailto:${PROFILE.email}`}>
+            <a className="inline-flex items-center gap-1.5 underline hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors" href={`mailto:${PROFILE.email}`}>
               <Mail className="w-3 h-3 sm:w-4 sm:h-4" /> Email
             </a>
-            <a className="inline-flex items-center gap-1.5 underline touch-manipulation" href={PROFILE.cv} download>
+            <a className="inline-flex items-center gap-1.5 underline hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors" href={PROFILE.cv} download>
               <Download className="w-3 h-3 sm:w-4 sm:h-4" /> CV
             </a>
           </div>
