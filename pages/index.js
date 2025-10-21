@@ -811,7 +811,7 @@ ${p.desc}`).join("\n\n")}`;
                     backgroundColor: 'transparent',
                     outline: 'none',
                     border: 'none',
-                    color: '#ffffff',
+                    color: 'transparent',
                     fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
                     fontSize: '14px',
                     caretColor: 'transparent',
@@ -828,7 +828,10 @@ ${p.desc}`).join("\n\n")}`;
                   right: 0,
                   bottom: 0,
                   whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-words'
+                  wordBreak: 'break-words',
+                  color: '#ffffff',
+                  fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
+                  fontSize: '14px'
                 }}>
                   {input}
                   {!inputDisabled && <Caret theme={theme} />}
