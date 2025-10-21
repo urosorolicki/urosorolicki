@@ -745,9 +745,9 @@ ${p.desc}`).join("\n\n")}`;
 
         {/* Terminal window */}
         <div className="mx-auto max-w-4xl px-2 sm:px-4 pb-10">
-          <div className="rounded-2xl border border-zinc-800/10 dark:border-white/10 bg-white dark:bg-zinc-950 shadow-xl">
+          <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-lg">
             {/* window chrome */}
-            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 border-b border-zinc-800/10 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900 rounded-t-2xl">
+            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 rounded-t-2xl">
               <div className="flex gap-1.5 sm:gap-2">
                 <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500"></span>
                 <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500"></span>
@@ -762,10 +762,12 @@ ${p.desc}`).join("\n\n")}`;
             <div
               ref={scrollerRef}
               onClick={handleTerminalClick}
-              className="h-[50vh] sm:h-[60vh] lg:h-[65vh] overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 text-xs sm:text-sm cursor-text bg-white dark:bg-zinc-950 font-mono"
+              className="h-[50vh] sm:h-[60vh] lg:h-[65vh] overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 text-xs sm:text-sm cursor-text bg-white dark:bg-zinc-950 font-mono border-0"
               style={{ 
                 fontFamily: '"SF Mono", Monaco, Inconsolata, "Roboto Mono", Consolas, "Courier New", monospace',
-                lineHeight: '1.5'
+                lineHeight: '1.5',
+                textRendering: 'optimizeSpeed',
+                WebkitFontSmoothing: 'antialiased'
               }}
             >
               <AnimatePresence initial={false}>
