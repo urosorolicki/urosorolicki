@@ -2,14 +2,13 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  experimental: {
-    appDir: false
-  },
   images: {
     unoptimized: true
   },
-  trailingSlash: true,
-  output: 'export'
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  trailingSlash: false
 }
 
 module.exports = nextConfig

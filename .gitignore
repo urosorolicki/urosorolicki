@@ -33,3 +33,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# old files
+urosorolicki.jsx
+uros_orolicki_terminal_portfolio_react.jsx
