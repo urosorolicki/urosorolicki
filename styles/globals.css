@@ -4,22 +4,13 @@
 
 html {
   scroll-behavior: smooth;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Inconsolata, "Roboto Mono", "Noto Sans Mono", "Droid Sans Mono", "Liberation Mono", source-code-pro, Menlo, "Courier New", monospace;
-}
-
-/* Fix scrolling and font rendering issues */
-* {
-  -webkit-backface-visibility: hidden;
-  -moz-backface-visibility: hidden;
-  -webkit-transform: translate3d(0, 0, 0);
-  -moz-transform: translate3d(0, 0, 0);
+  text-rendering: optimizeLegibility;
 }
 
 /* Custom scrollbar styles */
@@ -32,26 +23,26 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.3);
+  background: rgba(156, 163, 175, 0.4);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 163, 175, 0.5);
+  background: rgba(156, 163, 175, 0.6);
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(75, 85, 99, 0.5);
+  background: rgba(75, 85, 99, 0.6);
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(75, 85, 99, 0.7);
+  background: rgba(75, 85, 99, 0.8);
 }
 
-/* Improve terminal font rendering */
-.terminal-content {
+/* Terminal specific styling for crisp text */
+.terminal-text {
   font-family: "SF Mono", Monaco, Inconsolata, "Roboto Mono", Consolas, "Courier New", monospace;
-  font-feature-settings: "liga" 0;
+  font-variant-ligatures: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeSpeed;
