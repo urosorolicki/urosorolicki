@@ -1,6 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Github, Linkedin, Mail, TerminalSquare, Moon, Sun, Download } from "lucide-react";
 import Head from 'next/head';
 
 // ===== Editable profile data =====
@@ -83,9 +81,14 @@ const PROFILE = {
 
 const Caret = ({ theme }) => (
   <span
-    className={`inline-block w-2 h-5 align-text-bottom ml-0.5 ${
-      theme === "dark" ? "bg-green-400" : "bg-zinc-800"
-    } animate-pulse`}
+    style={{
+      display: 'inline-block',
+      width: '8px',
+      height: '20px',
+      backgroundColor: '#4ade80',
+      marginLeft: '2px',
+      animation: 'blink 1s infinite'
+    }}
   />
 );
 
@@ -124,54 +127,54 @@ const TypeWriter = ({ text, speed = 30, onComplete, className = "" }) => {
 
   // If text is JSX element, render it directly
   if (typeof text !== 'string') {
-    return <div className={className}>{text}</div>;
+    return <div>{text}</div>;
   }
 
   return (
-    <div className={className}>
-      <span className="whitespace-pre-wrap">{displayText}</span>
-      {!isComplete && <span className="animate-pulse">|</span>}
+    <div>
+      <span style={{ whiteSpace: 'pre-wrap' }}>{displayText}</span>
+      {!isComplete && <span style={{ animation: 'blink 1s infinite' }}>|</span>}
     </div>
   );
 };
 
 const Prompt = ({ theme }) => (
-  <span className="mr-2 select-none">
-    <span className={theme === "dark" ? "text-green-400" : "text-zinc-800"}>uros@devcraft</span>
-    <span className="text-zinc-500">:</span>
-    <span className={theme === "dark" ? "text-cyan-400" : "text-zinc-700"}>~/portfolio</span>
-    <span className="text-zinc-500">$</span>
+  <span style={{ marginRight: '8px', userSelect: 'none' }}>
+    <span style={{ color: '#4ade80' }}>uros@devcraft</span>
+    <span style={{ color: '#666' }}>:</span>
+    <span style={{ color: '#67e8f9' }}>~/portfolio</span>
+    <span style={{ color: '#666' }}>$</span>
   </span>
 );
 
 const asList = (items) => (
-  <ul className="list-disc pl-5 space-y-1">
+  <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
     {items.map((i, idx) => (
-      <li key={idx}>{i}</li>
+      <li key={idx} style={{ marginBottom: '4px' }}>{i}</li>
     ))}
   </ul>
 );
 
 const renderBanner = () => (
-  <pre className="whitespace-pre-wrap leading-5">
+  <pre style={{ whiteSpace: 'pre-wrap', lineHeight: '1.2' }}>
 {String.raw`  __  __           _      ____       _      _      _      
  |  \/  | ___  _| |_ ___/ __ \ ___ | | ___| | ___| | ___ 
  | |\/| |/ _ \| | __/ _ \ / _\` |/ _ \| |/ _ \ |/ _ \ |/ _ \
  | |  | | (_) | | ||  __/ | (_| | (_) | |  __/ |  __/ |  __/
  |_|  |_|\___/|_|\__\___|  \__,_|\___/|_|\___|_|\___|_|\___|
 `}
-    <span className="block mt-2 text-sm text-zinc-400">
+    <span style={{ display: 'block', marginTop: '8px', fontSize: '14px', color: '#888' }}>
       {PROFILE.name} — {PROFILE.title}
     </span>
   </pre>
 );
 
 const renderAbout = () => (
-  <div className="space-y-2">
-    <p>{PROFILE.summary}</p>
+  <div>
+    <p style={{ marginBottom: '8px' }}>{PROFILE.summary}</p>
     <p>
       <b>Location:</b> {PROFILE.location} · <b>Email:</b>{" "}
-      <a className="underline" href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a> · <b>Phone:</b> {PROFILE.phone}
+      <a style={{ textDecoration: 'underline', color: '#67e8f9' }} href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a> · <b>Phone:</b> {PROFILE.phone}
     </p>
   </div>
 );
@@ -718,131 +721,126 @@ ${p.desc}`).join("\n\n")}`;
         <title>{PROFILE.name} - {PROFILE.title}</title>
         <meta name="description" content={PROFILE.summary} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-        <meta property="og:title" content={`${PROFILE.name} - ${PROFILE.title}`} />
-        <meta property="og:description" content={PROFILE.summary} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${PROFILE.name} - ${PROFILE.title}`} />
-        <meta name="twitter:description" content={PROFILE.summary} />
       </Head>
       
-      <div className="min-h-screen w-full bg-zinc-50 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 transition-colors">
-        {/* Top bar */}
-        <div className="mx-auto max-w-4xl px-4 pt-6 pb-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <TerminalSquare className="w-5 h-5" />
-            <div className="font-semibold tracking-tight">{PROFILE.name}</div>
-            <div className="text-zinc-500">— {PROFILE.title}</div>
-          </div>
-          <button
-            onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-            className="inline-flex items-center gap-2 rounded-xl border border-zinc-800/10 dark:border-zinc-100/10 px-3 py-1.5 text-sm hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors"
-          >
-            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />} Theme
-          </button>
-        </div>
-
+      <div style={{ 
+        minHeight: '100vh', 
+        backgroundColor: '#000000', 
+        color: '#ffffff',
+        fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
+        padding: '20px'
+      }}>
+        
         {/* Terminal window */}
-        <div className="mx-auto max-w-4xl px-4 pb-10">
-          <div className="border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-black">
-            {/* window chrome */}
-            <div className="flex items-center gap-2 px-4 py-2 border-b-2 border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-              <div className="flex gap-2">
-                <span className="w-3 h-3 rounded-full bg-red-500"></span>
-                <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
-                <span className="w-3 h-3 rounded-full bg-green-500"></span>
-              </div>
-              <div className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                terminal — zsh
-              </div>
+        <div style={{ 
+          maxWidth: '800px', 
+          margin: '0 auto',
+          border: '2px solid #333',
+          backgroundColor: '#000'
+        }}>
+          {/* window chrome */}
+          <div style={{
+            padding: '10px',
+            borderBottom: '1px solid #333',
+            backgroundColor: '#111',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}>
+            <div style={{ display: 'flex', gap: '5px' }}>
+              <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ff5f56' }}></span>
+              <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ffbd2e' }}></span>
+              <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#27ca3f' }}></span>
             </div>
+            <span style={{ fontSize: '12px', color: '#888' }}>terminal</span>
+          </div>
 
-            {/* scrollable output */}
-            <div
-              ref={scrollerRef}
-              onClick={handleTerminalClick}
-              className="h-96 overflow-y-auto p-4 bg-white dark:bg-black text-black dark:text-white"
-              style={{ 
-                fontFamily: 'Courier New, monospace',
-                fontSize: '14px',
-                lineHeight: '1.4'
-              }}
-            >
-              <AnimatePresence initial={false}>
-                {lines.map((l) => (
-                  <motion.div
-                    key={l.id}
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.18 }}
-                    className="leading-6"
-                  >
-                    {l.useTypewriter ? (
-                      <TypeWriter 
-                        text={l.node}
-                        speed={20}
-                        onComplete={() => onTypewriterComplete(l.id)}
-                      />
-                    ) : (
-                      l.node
-                    )}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-
-              {/* input line */}
-              <div className="flex items-start">
-                <Prompt theme={theme} />
-                <div className="relative flex-1">
-                  <input
-                    ref={inputRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={onKeyDown}
-                    disabled={inputDisabled}
-                    className={`w-full bg-transparent outline-none caret-transparent ${
-                      inputDisabled ? 'opacity-50' : ''
-                    }`}
-                    autoFocus
-                    aria-label="terminal input"
+          {/* terminal content */}
+          <div
+            ref={scrollerRef}
+            onClick={handleTerminalClick}
+            className="terminal"
+            style={{
+              height: '500px',
+              overflowY: 'auto',
+              padding: '20px',
+              backgroundColor: '#000000',
+              color: '#ffffff',
+              fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
+              fontSize: '14px',
+              lineHeight: '1.3'
+            }}
+          >
+            {lines.map((l) => (
+              <div key={l.id} style={{ marginBottom: '4px' }}>
+                {l.useTypewriter ? (
+                  <TypeWriter 
+                    text={l.node}
+                    speed={20}
+                    onComplete={() => onTypewriterComplete(l.id)}
                   />
-                  <div className="pointer-events-none absolute inset-0 whitespace-pre-wrap break-words">
-                    {input}
-                    {!inputDisabled && <Caret theme={theme} />}
-                    {inputDisabled && <span className="text-zinc-500 animate-pulse">_</span>}
-                  </div>
+                ) : (
+                  l.node
+                )}
+              </div>
+            ))}
+
+            {/* input line */}
+            <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+              <Prompt theme={theme} />
+              <div style={{ position: 'relative', flex: '1' }}>
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  disabled={inputDisabled}
+                  style={{
+                    width: '100%',
+                    backgroundColor: 'transparent',
+                    outline: 'none',
+                    border: 'none',
+                    color: '#ffffff',
+                    fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
+                    fontSize: '14px',
+                    caretColor: 'transparent',
+                    opacity: inputDisabled ? 0.5 : 1
+                  }}
+                  autoFocus
+                  aria-label="terminal input"
+                />
+                <div style={{
+                  pointerEvents: 'none',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-words'
+                }}>
+                  {input}
+                  {!inputDisabled && <Caret theme={theme} />}
+                  {inputDisabled && <span style={{ color: '#666' }}>_</span>}
                 </div>
               </div>
             </div>
-            {/* END scrollable output */}
           </div>
-          {/* END terminal card */}
 
-          {/* Quick links under terminal */}
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-4 text-xs sm:text-sm">
-            <a className="inline-flex items-center gap-1.5 underline hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors" href={PROFILE.github} target="_blank" rel="noreferrer">
-              <Github className="w-3 h-3 sm:w-4 sm:h-4" /> GitHub
-            </a>
-            <a className="inline-flex items-center gap-1.5 underline hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors" href={PROFILE.linkedin} target="_blank" rel="noreferrer">
-              <Linkedin className="w-3 h-3 sm:w-4 sm:h-4" /> LinkedIn
-            </a>
-            <a className="inline-flex items-center gap-1.5 underline hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors" href={`mailto:${PROFILE.email}`}>
-              <Mail className="w-3 h-3 sm:w-4 sm:h-4" /> Email
-            </a>
-            <a className="inline-flex items-center gap-1.5 underline hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors" href={PROFILE.cv} download>
-              <Download className="w-3 h-3 sm:w-4 sm:h-4" /> CV
-            </a>
-          </div>
-          
-          {/* Mobile helper text */}
-          <div className="block sm:hidden mt-4 text-xs text-zinc-500 text-center">
-            <div>Tap terminal to focus. Use virtual keyboard.</div>
-            <div className="mt-1">Try: help, about, skills cloud</div>
-          </div>
+          {/* touch helper */}
+          {showTouchHelper && (
+            <div style={{
+              textAlign: 'center',
+              padding: '10px',
+              backgroundColor: '#111',
+              fontSize: '12px',
+              color: '#666'
+            }}>
+              <div>Tap terminal to focus. Use virtual keyboard.</div>
+              <div style={{ marginTop: '5px' }}>Try: help, about, skills cloud</div>
+            </div>
+          )}
         </div>
-        {/* END outer container padding */}
       </div>
     </>
   );

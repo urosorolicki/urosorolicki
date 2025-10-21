@@ -1,49 +1,24 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
-html, body {
-  font-family: 'Courier New', Courier, monospace;
-  -webkit-font-smoothing: auto;
-  -moz-osx-font-smoothing: auto;
-  text-rendering: auto;
+body {
+  font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
+  background: #000;
+  color: #fff;
 }
 
-/* UKLONI SVE EFEKTE */
-*, *::before, *::after {
-  backdrop-filter: none !important;
-  filter: none !important;
-  transform: none !important;
-  will-change: auto !important;
-  -webkit-backdrop-filter: none !important;
-  -webkit-filter: none !important;
-  -webkit-transform: none !important;
+.terminal {
+  font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #ffffff;
+  background-color: #000000;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 12px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 6px;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: #333;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #666;
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
