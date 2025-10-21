@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Github, Linkedin, Mail, TerminalSquare, Moon, Sun, Download } from "lucide-react";
+import Head from 'next/head';
 
 // ===== Editable profile data =====
 const PROFILE = {
@@ -298,26 +299,29 @@ const renderHelp = () => (
 );
 
 export default function PortfolioTerminal() {
-  const [theme, setTheme] = useState(() => (
-    typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light"
-  ));
+  const [theme, setTheme] = useState("dark");
+  const [mounted, setMounted] = useState(false);
+
+  // Handle hydration mismatch
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") root.classList.add("dark");
-    else root.classList.remove("dark");
-  }, [theme]);
+    setMounted(true);
+    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      setTheme("dark");
+    } else {
+      setTheme("light");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      const root = document.documentElement;
+      if (theme === "dark") root.classList.add("dark");
+      else root.classList.remove("dark");
+    }
+  }, [theme, mounted]);
 
   const [input, setInput] = useState("");
-  const [history, setHistory] = useState(() => {
-    // Load history from localStorage
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("terminal-history");
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
+  const [history, setHistory] = useState([]);
   const [pointer, setPointer] = useState(-1);
   const [lines, setLines] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -325,6 +329,16 @@ export default function PortfolioTerminal() {
   const idRef = useRef(0);
   const scrollerRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Load history from localStorage after mount
+  useEffect(() => {
+    if (mounted && typeof window !== "undefined") {
+      const saved = localStorage.getItem("terminal-history");
+      if (saved) {
+        setHistory(JSON.parse(saved));
+      }
+    }
+  }, [mounted]);
 
   // Focus input when terminal is clicked (especially useful on mobile)
   const handleTerminalClick = useCallback(() => {
@@ -335,10 +349,10 @@ export default function PortfolioTerminal() {
 
   // Save history to localStorage whenever it changes
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (mounted && typeof window !== "undefined") {
       localStorage.setItem("terminal-history", JSON.stringify(history));
     }
-  }, [history]);
+  }, [history, mounted]);
 
   const COMMANDS = useMemo(
     () => ({
@@ -454,36 +468,16 @@ export default function PortfolioTerminal() {
     [theme]
   );
 
-  // --- lightweight self-test to catch regressions (runs once in dev) ---
   useEffect(() => {
-    try {
-      const required = [
-        "help",
-        "banner",
-        "about",
-        "skills",
-        "experience",
-        "projects",
-        "links",
-        "download-cv",
-        "theme",
-        "clear",
-      ];
-      required.forEach((k) => {
-        // eslint-disable-next-line no-console
-        console.assert(typeof COMMANDS[k] === "function", `Missing command: ${k}`);
-      });
-    } catch (_) {}
-  }, [COMMANDS]);
-
-  useEffect(() => {
-    pushOutput(renderBanner());
-    pushOutput(
-      <div className="mt-1">
-        Type <code>help</code> to get started.
-      </div>
-    );
-  }, []);
+    if (mounted) {
+      pushOutput(renderBanner());
+      pushOutput(
+        <div className="mt-1">
+          Type <code>help</code> to get started.
+        </div>
+      );
+    }
+  }, [mounted]);
 
   useEffect(() => {
     scrollerRef.current?.scrollTo({ top: scrollerRef.current.scrollHeight, behavior: "smooth" });
@@ -645,118 +639,138 @@ export default function PortfolioTerminal() {
     }
   }
 
+  // Don't render until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return <div className="min-h-screen bg-zinc-900" />; // Simple loading state
+  }
+
   return (
-    <div className="min-h-dvh w-full bg-zinc-50 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 transition-colors">
-      {/* Top bar */}
-      <div className="mx-auto max-w-4xl px-4 pt-6 pb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <TerminalSquare className="w-5 h-5" />
-          <div className="font-semibold tracking-tight">{PROFILE.name}</div>
-          <div className="text-zinc-500">— {PROFILE.title}</div>
-        </div>
-        <button
-          onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-          className="inline-flex items-center gap-2 rounded-xl border border-zinc-800/10 dark:border-zinc-100/10 px-3 py-1.5 text-sm hover:bg-zinc-800/5 dark:hover:bg-white/5"
-        >
-          {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />} Theme
-        </button>
-      </div>
-
-      {/* Terminal window */}
-      <div className="mx-auto max-w-4xl px-2 sm:px-4 pb-10">
-        <div className="rounded-2xl border border-zinc-800/10 dark:border-white/10 bg-white/70 dark:bg-zinc-950/70 shadow-xl backdrop-blur">
-          {/* window chrome */}
-          <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 border-b border-zinc-800/10 dark:border-white/10">
-            <div className="flex gap-1.5 sm:gap-2">
-              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400/90"></span>
-              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-400/90"></span>
-              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-400/90"></span>
-            </div>
-            <div className="ml-2 text-xs sm:text-sm text-zinc-500 truncate">
-              {PROFILE.name.toLowerCase().replaceAll(" ", "-")}:~/portfolio — zsh
-            </div>
+    <>
+      <Head>
+        <title>{PROFILE.name} - {PROFILE.title}</title>
+        <meta name="description" content={PROFILE.summary} />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+        <meta property="og:title" content={`${PROFILE.name} - ${PROFILE.title}`} />
+        <meta property="og:description" content={PROFILE.summary} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${PROFILE.name} - ${PROFILE.title}`} />
+        <meta name="twitter:description" content={PROFILE.summary} />
+      </Head>
+      
+      <div className="min-h-screen w-full bg-zinc-50 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 transition-colors">
+        {/* Top bar */}
+        <div className="mx-auto max-w-4xl px-4 pt-6 pb-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TerminalSquare className="w-5 h-5" />
+            <div className="font-semibold tracking-tight">{PROFILE.name}</div>
+            <div className="text-zinc-500">— {PROFILE.title}</div>
           </div>
-
-          {/* scrollable output */}
-          <div
-            ref={scrollerRef}
-            onClick={handleTerminalClick}
-            className="h-[50vh] sm:h-[60vh] lg:h-[65vh] overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 font-mono text-xs sm:text-sm cursor-text"
+          <button
+            onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+            className="inline-flex items-center gap-2 rounded-xl border border-zinc-800/10 dark:border-zinc-100/10 px-3 py-1.5 text-sm hover:bg-zinc-800/5 dark:hover:bg-white/5"
           >
-            <AnimatePresence initial={false}>
-              {lines.map((l) => (
-                <motion.div
-                  key={l.id}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.18 }}
-                  className="leading-6"
-                >
-                  {l.useTypewriter ? (
-                    <TypeWriter 
-                      text={l.node}
-                      speed={20}
-                      onComplete={() => onTypewriterComplete(l.id)}
-                    />
-                  ) : (
-                    l.node
-                  )}
-                </motion.div>
-              ))}
-            </AnimatePresence>
+            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />} Theme
+          </button>
+        </div>
 
-            {/* input line */}
-            <div className="flex items-start">
-              <Prompt theme={theme} />
-              <div className="relative flex-1">
-                <input
-                  ref={inputRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={onKeyDown}
-                  disabled={inputDisabled}
-                  className={`w-full bg-transparent outline-none caret-transparent ${
-                    inputDisabled ? 'opacity-50' : ''
-                  }`}
-                  autoFocus
-                  aria-label="terminal input"
-                />
-                <div className="pointer-events-none absolute inset-0 whitespace-pre-wrap break-words">
-                  {input}
-                  {!inputDisabled && <Caret theme={theme} />}
-                  {inputDisabled && <span className="text-zinc-500 animate-pulse">_</span>}
+        {/* Terminal window */}
+        <div className="mx-auto max-w-4xl px-2 sm:px-4 pb-10">
+          <div className="rounded-2xl border border-zinc-800/10 dark:border-white/10 bg-white/70 dark:bg-zinc-950/70 shadow-xl backdrop-blur">
+            {/* window chrome */}
+            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 border-b border-zinc-800/10 dark:border-white/10">
+              <div className="flex gap-1.5 sm:gap-2">
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400/90"></span>
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-400/90"></span>
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-400/90"></span>
+              </div>
+              <div className="ml-2 text-xs sm:text-sm text-zinc-500 truncate">
+                {PROFILE.name.toLowerCase().replaceAll(" ", "-")}:~/portfolio — zsh
+              </div>
+            </div>
+
+            {/* scrollable output */}
+            <div
+              ref={scrollerRef}
+              onClick={handleTerminalClick}
+              className="h-[50vh] sm:h-[60vh] lg:h-[65vh] overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 font-mono text-xs sm:text-sm cursor-text"
+            >
+              <AnimatePresence initial={false}>
+                {lines.map((l) => (
+                  <motion.div
+                    key={l.id}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.18 }}
+                    className="leading-6"
+                  >
+                    {l.useTypewriter ? (
+                      <TypeWriter 
+                        text={l.node}
+                        speed={20}
+                        onComplete={() => onTypewriterComplete(l.id)}
+                      />
+                    ) : (
+                      l.node
+                    )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              {/* input line */}
+              <div className="flex items-start">
+                <Prompt theme={theme} />
+                <div className="relative flex-1">
+                  <input
+                    ref={inputRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={onKeyDown}
+                    disabled={inputDisabled}
+                    className={`w-full bg-transparent outline-none caret-transparent ${
+                      inputDisabled ? 'opacity-50' : ''
+                    }`}
+                    autoFocus
+                    aria-label="terminal input"
+                  />
+                  <div className="pointer-events-none absolute inset-0 whitespace-pre-wrap break-words">
+                    {input}
+                    {!inputDisabled && <Caret theme={theme} />}
+                    {inputDisabled && <span className="text-zinc-500 animate-pulse">_</span>}
+                  </div>
                 </div>
               </div>
             </div>
+            {/* END scrollable output */}
           </div>
-          {/* END scrollable output */}
-        </div>
-        {/* END terminal card */}
+          {/* END terminal card */}
 
-        {/* Quick links under terminal */}
-        <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-4 text-xs sm:text-sm">
-          <a className="inline-flex items-center gap-1.5 underline touch-manipulation" href={PROFILE.github} target="_blank" rel="noreferrer">
-            <Github className="w-3 h-3 sm:w-4 sm:h-4" /> GitHub
-          </a>
-          <a className="inline-flex items-center gap-1.5 underline touch-manipulation" href={PROFILE.linkedin} target="_blank" rel="noreferrer">
-            <Linkedin className="w-3 h-3 sm:w-4 sm:h-4" /> LinkedIn
-          </a>
-          <a className="inline-flex items-center gap-1.5 underline touch-manipulation" href={`mailto:${PROFILE.email}`}>
-            <Mail className="w-3 h-3 sm:w-4 sm:h-4" /> Email
-          </a>
-          <a className="inline-flex items-center gap-1.5 underline touch-manipulation" href={PROFILE.cv} download>
-            <Download className="w-3 h-3 sm:w-4 sm:h-4" /> CV
-          </a>
+          {/* Quick links under terminal */}
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-4 text-xs sm:text-sm">
+            <a className="inline-flex items-center gap-1.5 underline touch-manipulation" href={PROFILE.github} target="_blank" rel="noreferrer">
+              <Github className="w-3 h-3 sm:w-4 sm:h-4" /> GitHub
+            </a>
+            <a className="inline-flex items-center gap-1.5 underline touch-manipulation" href={PROFILE.linkedin} target="_blank" rel="noreferrer">
+              <Linkedin className="w-3 h-3 sm:w-4 sm:h-4" /> LinkedIn
+            </a>
+            <a className="inline-flex items-center gap-1.5 underline touch-manipulation" href={`mailto:${PROFILE.email}`}>
+              <Mail className="w-3 h-3 sm:w-4 sm:h-4" /> Email
+            </a>
+            <a className="inline-flex items-center gap-1.5 underline touch-manipulation" href={PROFILE.cv} download>
+              <Download className="w-3 h-3 sm:w-4 sm:h-4" /> CV
+            </a>
+          </div>
+          
+          {/* Mobile helper text */}
+          <div className="block sm:hidden mt-4 text-xs text-zinc-500 text-center">
+            <div>Tap terminal to focus. Use virtual keyboard.</div>
+            <div className="mt-1">Try: help, about, skills cloud</div>
+          </div>
         </div>
-        
-        {/* Mobile helper text */}
-        <div className="block sm:hidden mt-4 text-xs text-zinc-500 text-center">
-          <div>Tap terminal to focus. Use virtual keyboard.</div>
-          <div className="mt-1">Try: help, about, skills cloud</div>
-        </div>
+        {/* END outer container padding */}
       </div>
-      {/* END outer container padding */}
-    </div>
+    </>
   );
 }
