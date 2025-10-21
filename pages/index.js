@@ -744,17 +744,17 @@ ${p.desc}`).join("\n\n")}`;
         </div>
 
         {/* Terminal window */}
-        <div className="mx-auto max-w-4xl px-2 sm:px-4 pb-10">
-          <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-lg">
+        <div className="mx-auto max-w-4xl px-4 pb-10">
+          <div className="border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-black">
             {/* window chrome */}
-            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 rounded-t-2xl">
-              <div className="flex gap-1.5 sm:gap-2">
-                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500"></span>
-                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500"></span>
-                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500"></span>
+            <div className="flex items-center gap-2 px-4 py-2 border-b-2 border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+              <div className="flex gap-2">
+                <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
+                <span className="w-3 h-3 rounded-full bg-green-500"></span>
               </div>
-              <div className="ml-2 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 truncate font-mono">
-                {PROFILE.name.toLowerCase().replaceAll(" ", "-")}:~/portfolio — zsh
+              <div className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                terminal — zsh
               </div>
             </div>
 
@@ -762,12 +762,11 @@ ${p.desc}`).join("\n\n")}`;
             <div
               ref={scrollerRef}
               onClick={handleTerminalClick}
-              className="h-[50vh] sm:h-[60vh] lg:h-[65vh] overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 text-xs sm:text-sm cursor-text bg-white dark:bg-zinc-950 font-mono border-0"
+              className="h-96 overflow-y-auto p-4 bg-white dark:bg-black text-black dark:text-white"
               style={{ 
-                fontFamily: '"SF Mono", Monaco, Inconsolata, "Roboto Mono", Consolas, "Courier New", monospace',
-                lineHeight: '1.5',
-                textRendering: 'optimizeSpeed',
-                WebkitFontSmoothing: 'antialiased'
+                fontFamily: 'Courier New, monospace',
+                fontSize: '14px',
+                lineHeight: '1.4'
               }}
             >
               <AnimatePresence initial={false}>

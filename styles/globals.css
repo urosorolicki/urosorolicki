@@ -2,60 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeSpeed;
-}
-
-body {
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Inconsolata, "Roboto Mono", "Noto Sans Mono", "Droid Sans Mono", "Liberation Mono", source-code-pro, Menlo, "Courier New", monospace;
-  text-rendering: optimizeSpeed;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Disable all potential blur sources */
 * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  font-family: 'Courier New', Courier, monospace;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+  text-rendering: auto;
+}
+
+/* UKLONI SVE EFEKTE */
+*, *::before, *::after {
   backdrop-filter: none !important;
   filter: none !important;
   transform: none !important;
   will-change: auto !important;
+  -webkit-backdrop-filter: none !important;
+  -webkit-filter: none !important;
+  -webkit-transform: none !important;
 }
 
-/* Custom scrollbar styles */
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.5);
-  border-radius: 4px;
+  background: #888;
+  border-radius: 6px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 163, 175, 0.7);
+.dark ::-webkit-scrollbar-track {
+  background: #333;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(75, 85, 99, 0.7);
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(75, 85, 99, 0.9);
-}
-
-/* Terminal specific styling for crisp text */
-.terminal-text, .font-mono {
-  font-family: "SF Mono", Monaco, Inconsolata, "Roboto Mono", Consolas, "Courier New", monospace !important;
-  font-variant-ligatures: none !important;
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-  text-rendering: optimizeSpeed !important;
-  font-synthesis: none !important;
+  background: #666;
 }
