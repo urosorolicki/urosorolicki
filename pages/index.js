@@ -330,7 +330,7 @@ const ModernTerminalCV = () => {
     <h3>Resume Download</h3>
   </div>
   <p>Click the link below to download my latest resume:</p>
-  <a href="/UrosOrolicki.pdf" target="_blank" class="download-link">
+  <a href="/Uros_Orolicki_CV.pdf" target="_blank" class="download-link">
     📥 Download Resume (PDF)
   </a>
 </div>`;
