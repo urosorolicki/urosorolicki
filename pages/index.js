@@ -1,851 +1,1210 @@
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 
-// ===== Editable profile data =====
-const PROFILE = {
-  name: "Uroš Orolicki",
-  title: "DevOps Engineer",
-  location: "Belgrade, Serbia",
-  email: "orolickiiuros@gmail.com",
-  phone: "+381 60 310 5060",
-  github: "https://github.com/urosorolicki",
-  linkedin: "https://www.linkedin.com/in/urosorolicki/",
-  cv: "/Uros_Orolicki_CV_Modern.pdf", // local or hosted link to CV
-  summary:
-    "DevOps Engineer focused on AWS, Kubernetes, Terraform, and CI/CD automation. I build scalable, reliable systems and smooth developer workflows.",
-  skills: {
-    Cloud: ["AWS (multi-account)", "Cost optimization", "Security best practices"],
-    Containers: ["Docker", "Kubernetes (EKS)"],
-    "Infrastructure as Code": ["Terraform"],
-    CI_CD: ["GitHub Actions", "Argo CD", "Argo Workflows"],
-    Monitoring: ["SumoLogic", "Sentry"],
-    Programming: ["Python", "JavaScript (basic)"] ,
-    Databases: ["MySQL"],
-    VCS: ["Git"],
-  },
-  experience: [
-    {
-      role: "Cloud DevOps Engineer",
-      company: "Raiffeisen Bank AD Beograd",
-      period: "Nov 2023 – Oct 2025",
-      bullets: [
-        "Managed AWS infrastructure across multiple accounts; optimized resources and costs.",
-        "Implemented Argo CD; automated progressive, reliable deployments.",
-        "Deployed and maintained Kubernetes clusters for mission‑critical apps.",
-        "Partnered with security/compliance to meet banking standards.",
-      ],
-    },
-    {
-      role: "DevOps Engineer",
-      company: "Ananas E‑Commerce",
-      period: "Sep 2022 – Nov 2023",
-      bullets: [
-        "Maintained and scaled microservices infrastructure.",
-        "Built CI/CD with GitHub Actions + Argo CD; managed Terraform and EKS.",
-        "Introduced observability with SumoLogic and Sentry.",
-        "Supported developers; improved deployment lead time.",
-      ],
-    },
-    {
-      role: "Junior Software Engineer (Backend/DevOps)",
-      company: "Ananas E‑Commerce",
-      period: "May 2022 – Sep 2022",
-      bullets: [
-        "Contributed to backend services and internal automation.",
-        "Helped evolve CI/CD pipelines and testing workflows.",
-      ],
-    },
-    {
-      role: "Junior Developer",
-      company: "Ananas E‑Commerce",
-      period: "Nov 2021 – May 2022",
-      bullets: [
-        "Built internal web tools and reusable UI components.",
-        "Integrated Algolia search to speed up discovery.",
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "EKS GitOps Platform",
-      desc:
-        "Cluster-level GitOps with Argo CD: app-of-apps pattern, environment segregation (dev/stage/prod), and automated rollbacks.",
-    },
-    {
-      name: "Infra-as-Code Foundation",
-      desc:
-        "Terraform modules for AWS accounts, VPC, EKS, IAM roles, and cost guardrails; reusable for multiple teams.",
-    },
-  ],
-};
-
-const Caret = ({ theme }) => (
-  <span
-    style={{
-      display: 'inline-block',
-      width: '8px',
-      height: '20px',
-      backgroundColor: '#4ade80',
-      marginLeft: '2px',
-      animation: 'blink 1s infinite'
-    }}
-  />
-);
-
-// Typewriter component for realistic typing effect
-const TypeWriter = ({ text, speed = 30, onComplete, className = "" }) => {
-  const [displayText, setDisplayText] = useState("");
-  const [isComplete, setIsComplete] = useState(false);
-
-  useEffect(() => {
-    if (!text) {
-      onComplete?.();
-      return;
-    }
-
-    // If text is not a string (JSX element), render directly without typewriter
-    if (typeof text !== 'string') {
-      setIsComplete(true);
-      onComplete?.();
-      return;
-    }
-
-    let currentIndex = 0;
-    const timer = setInterval(() => {
-      if (currentIndex < text.length) {
-        setDisplayText(text.slice(0, currentIndex + 1));
-        currentIndex++;
-      } else {
-        setIsComplete(true);
-        clearInterval(timer);
-        setTimeout(() => onComplete?.(), 100);
-      }
-    }, speed);
-
-    return () => clearInterval(timer);
-  }, [text, speed, onComplete]);
-
-  // If text is JSX element, render it directly
-  if (typeof text !== 'string') {
-    return <div>{text}</div>;
-  }
-
-  return (
-    <div>
-      <span style={{ whiteSpace: 'pre-wrap' }}>{displayText}</span>
-      {!isComplete && <span style={{ animation: 'blink 1s infinite' }}>|</span>}
-    </div>
-  );
-};
-
-const Prompt = ({ theme }) => (
-  <span style={{ marginRight: '8px', userSelect: 'none' }}>
-    <span style={{ color: '#4ade80' }}>uros@devcraft</span>
-    <span style={{ color: '#666' }}>:</span>
-    <span style={{ color: '#67e8f9' }}>~/portfolio</span>
-    <span style={{ color: '#666' }}>$</span>
-  </span>
-);
-
-const asList = (items) => (
-  <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-    {items.map((i, idx) => (
-      <li key={idx} style={{ marginBottom: '4px' }}>{i}</li>
-    ))}
-  </ul>
-);
-
-const renderBanner = () => (
-  <pre style={{ whiteSpace: 'pre-wrap', lineHeight: '1.2' }}>
-{String.raw`  __  __           _      ____       _      _      _      
- |  \/  | ___  _| |_ ___/ __ \ ___ | | ___| | ___| | ___ 
- | |\/| |/ _ \| | __/ _ \ / _\` |/ _ \| |/ _ \ |/ _ \ |/ _ \
- | |  | | (_) | | ||  __/ | (_| | (_) | |  __/ |  __/ |  __/
- |_|  |_|\___/|_|\__\___|  \__,_|\___/|_|\___|_|\___|_|\___|
-`}
-    <span style={{ display: 'block', marginTop: '8px', fontSize: '14px', color: '#888' }}>
-      {PROFILE.name} — {PROFILE.title}
-    </span>
-  </pre>
-);
-
-const renderAbout = () => (
-  <div>
-    <p style={{ marginBottom: '8px' }}>{PROFILE.summary}</p>
-    <p>
-      <b>Location:</b> {PROFILE.location} · <b>Email:</b>{" "}
-      <a style={{ textDecoration: 'underline', color: '#67e8f9' }} href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a> · <b>Phone:</b> {PROFILE.phone}
-    </p>
-  </div>
-);
-
-const renderSkills = (args = []) => {
-  const category = args[0]?.toLowerCase();
-  
-  if (category) {
-    const skillCategories = Object.keys(PROFILE.skills).map(k => k.toLowerCase().replace("_", "/"));
-    const matchedKey = Object.keys(PROFILE.skills).find(k => 
-      k.toLowerCase().replace("_", "/").includes(category)
-    );
-    
-    if (matchedKey) {
-      return (
-        <div>
-          <span className="font-semibold">{matchedKey.replace("_", "/")}: </span>
-          <span className="text-zinc-200/90 dark:text-zinc-300">{PROFILE.skills[matchedKey].join(", ")}</span>
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          Category '{category}' not found. Available: {skillCategories.join(", ")}
-        </div>
-      );
-    }
-  }
-
-  return (
-    <div className="space-y-2">
-      {Object.entries(PROFILE.skills).map(([k, v]) => (
-        <div key={k}>
-          <span className="font-semibold">{k.replace("_", "/")}: </span>
-          <span className="text-zinc-200/90 dark:text-zinc-300">{v.join(", ")}</span>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const renderExperience = (args = []) => {
-  const recent = args.includes("--recent") || args.includes("-r");
-  const experiences = recent ? PROFILE.experience.slice(0, 2) : PROFILE.experience;
-  
-  return (
-    <div className="space-y-4">
-      {experiences.map((e, i) => (
-        <div key={i}>
-          <div className="font-semibold">
-            {e.role} — {e.company} <span className="text-zinc-500">({e.period})</span>
-          </div>
-          {asList(e.bullets)}
-        </div>
-      ))}
-      {recent && (
-        <div className="text-zinc-500 text-sm">
-          Showing recent experience only. Use 'experience' for full history.
-        </div>
-      )}
-    </div>
-  );
-};
-
-const renderProjects = () => (
-  <div className="space-y-3">
-    {PROFILE.projects.map((p, i) => (
-      <div key={i}>
-        <div className="font-semibold">{p.name}</div>
-        <p className="text-zinc-200/90 dark:text-zinc-300">{p.desc}</p>
-      </div>
-    ))}
-  </div>
-);
-
-const renderLinks = () => (
-  <div className="flex flex-wrap gap-4 items-center">
-    <a className="inline-flex items-center gap-2 underline" href={PROFILE.github} target="_blank" rel="noreferrer">
-      <Github className="w-4 h-4" /> github.com/urosorolicki
-    </a>
-    <a className="inline-flex items-center gap-2 underline" href={PROFILE.linkedin} target="_blank" rel="noreferrer">
-      <Linkedin className="w-4 h-4" /> linkedin.com/in/urosorolicki
-    </a>
-    <a className="inline-flex items-center gap-2 underline" href={`mailto:${PROFILE.email}`}>
-      <Mail className="w-4 h-4" /> {PROFILE.email}
-    </a>
-  </div>
-);
-
-const renderDownload = () => (
-  <div>
-    <a href={PROFILE.cv} download className="inline-flex items-center gap-2 underline">
-      <Download className="w-4 h-4" /> Download CV
-    </a>
-  </div>
-);
-
-const renderHelp = () => (
-  <div className="space-y-1">
-    <div>Available commands:</div>
-    {asList([
-      "help — show available commands",
-      "banner — show ASCII banner",
-      "about — short profile and contact",
-      "skills [category] — tech stack (try: skills cloud)",
-      "experience [--recent] — work history",
-      "projects — highlights",
-      "links — GitHub/LinkedIn/E-mail",
-      "download-cv — download my CV",
-      "",
-      "Terminal commands:",
-      "whoami — current user",
-      "pwd — current directory", 
-      "ls [-l] — list files",
-      "cat <file> — display file contents",
-      "grep <pattern> — search for pattern",
-      "",
-      "Fun stuff:",
-      "matrix — enter the matrix",
-      "quote — random programming quote",
-      "theme — toggle light/dark",
-      "clear — clear screen",
-    ])}
-    <div className="text-xs text-zinc-500 mt-2">
-      Tip: Use ↑/↓ to navigate command history. Press Tab to autocomplete.
-      <br />Try: skills cloud, experience --recent, cat README.md, ls -l
-    </div>
-  </div>
-);
-
-export default function PortfolioTerminal() {
-  const [theme, setTheme] = useState("dark");
-  const [mounted, setMounted] = useState(false);
-
-  // Handle hydration mismatch
-  useEffect(() => {
-    setMounted(true);
-    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setTheme("dark");
-    } else {
-      setTheme("light");
-    }
-  }, []);
-
-  useEffect(() => {
-    if (mounted) {
-      const root = document.documentElement;
-      if (theme === "dark") root.classList.add("dark");
-      else root.classList.remove("dark");
-    }
-  }, [theme, mounted]);
-
-  const [input, setInput] = useState("");
+const ModernTerminalCV = () => {
+  const [input, setInput] = useState('');
   const [history, setHistory] = useState([]);
-  const [pointer, setPointer] = useState(-1);
-  const [lines, setLines] = useState([]);
-  const [isTyping, setIsTyping] = useState(false);
-  const [inputDisabled, setInputDisabled] = useState(false);
-  const [showTouchHelper, setShowTouchHelper] = useState(false);
-  const idRef = useRef(0);
-  const scrollerRef = useRef(null);
+  const [commandHistory, setCommandHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [currentPath, setCurrentPath] = useState('~');
   const inputRef = useRef(null);
+  const outputRef = useRef(null);
 
-  // Load history from localStorage after mount
-  useEffect(() => {
-    if (mounted && typeof window !== "undefined") {
-      const saved = localStorage.getItem("terminal-history");
-      if (saved) {
-        setHistory(JSON.parse(saved));
+  const commands = {
+    help: {
+      description: 'Show available commands',
+      action: () => {
+        return `
+<div class="help-section">
+  <div class="help-header">🚀 Available Commands:</div>
+  <div class="command-list">
+    <div class="command-item"><span class="cmd">about</span> - Learn about Uroš Orolicki</div>
+    <div class="command-item"><span class="cmd">experience</span> - Professional experience</div>
+    <div class="command-item"><span class="cmd">skills</span> - Technical skills & expertise</div>
+    <div class="command-item"><span class="cmd">projects</span> - Featured projects</div>
+    <div class="command-item"><span class="cmd">contact</span> - Get in touch</div>
+    <div class="command-item"><span class="cmd">resume</span> - Download resume</div>
+    <div class="command-item"><span class="cmd">clear</span> - Clear terminal</div>
+    <div class="command-item"><span class="cmd">modern</span> - Switch to modern portfolio</div>
+  </div>
+</div>`;
+      }
+    },
+
+    about: {
+      description: 'Learn about Uroš Orolicki',
+      action: () => {
+        return `
+<div class="about-section">
+  <div class="profile-header">
+    <div class="avatar">UO</div>
+    <div class="profile-info">
+      <h2 class="name">Uroš Orolicki</h2>
+      <div class="title">Data DevOps Engineer & Cloud Infrastructure Specialist</div>
+    </div>
+  </div>
+  
+  <div class="bio">
+    <p>🚀 Passionate DevOps Engineer with 4+ years of experience in cloud infrastructure and automation.</p>
+    <p>☁️ Specializing in AWS, Kubernetes (EKS), Terraform, and GitOps with ArgoCD.</p>
+    <p>🏦 Experience in enterprise banking infrastructure and data analytics platforms.</p>
+    <p>🛠️ Expert in CI/CD automation, infrastructure as code, and observability solutions.</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat"><span class="number">4+</span><span class="label">Years Experience</span></div>
+    <div class="stat"><span class="number">3</span><span class="label">Major Companies</span></div>
+    <div class="stat"><span class="number">Banking</span><span class="label">& Data Analytics</span></div>
+  </div>
+</div>`;
+      }
+    },
+
+    experience: {
+      description: 'Show professional experience',
+      action: () => {
+        return `
+<div class="experience-section">
+  <div class="job">
+    <div class="job-header">
+      <div class="period">Sep 2025 - Nov 2025</div>
+      <div class="position">Data DevOps Engineer</div>
+      <div class="company">BlueGrid.io · Part-time</div>
+    </div>
+    <div class="job-content">
+      <p>Working with a data analytics and media intelligence platform focused on large-scale data processing and cloud automation.</p>
+      <ul class="achievements">
+        <li>✓ Designed and automated multi-account AWS infrastructure using Terraform Cloud with OIDC authentication</li>
+        <li>✓ Built and maintained Kubernetes (EKS) clusters for data pipelines using Helm and ArgoCD</li>
+        <li>✓ Implemented Elastic ECK stack with role-based security and snapshot automation</li>
+        <li>✓ Set up comprehensive observability with New Relic and Metricbeat dashboards</li>
+        <li>✓ Enhanced networking and VPC topology across environments for scalable data ingestion</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="job">
+    <div class="job-header">
+      <div class="period">Nov 2023 - Aug 2025</div>
+      <div class="position">Cloud DevOps Engineer</div>
+      <div class="company">Raiffeisen banka a.d. Beograd · Full-time</div>
+    </div>
+    <div class="job-content">
+      <p>Managing AWS infrastructure across diverse accounts, optimizing resources for banking services.</p>
+      <ul class="achievements">
+        <li>✓ Implemented Argo CD for continuous delivery within Kubernetes clusters</li>
+        <li>✓ Deployed and managed Kubernetes clusters for critical banking operations</li>
+        <li>✓ Executed cloud migration strategies ensuring security and compliance</li>
+        <li>✓ Automated deployment pipelines using Terraform, reducing deployment times</li>
+        <li>✓ Optimized workflows and enhanced team productivity during cloud migration</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="job">
+    <div class="job-header">
+      <div class="period">Sep 2022 - Nov 2023</div>
+      <div class="position">DevOps Engineer</div>
+      <div class="company">Ananas E-commerce · Full-time</div>
+    </div>
+    <div class="job-content">
+      <p>Daily support tasks for developers working with AWS, Kubernetes, and automation tools.</p>
+      <ul class="achievements">
+        <li>✓ Created several CI/CD pipelines using GitHub Actions and ArgoCD</li>
+        <li>✓ Maintained infrastructure and microservices used daily</li>
+        <li>✓ Monitored platform performance through SumoLogic and Sentry</li>
+        <li>✓ Worked extensively with Terraform, Argo Workflows, and Kubernetes</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="job">
+    <div class="job-header">
+      <div class="period">May 2022 - Sep 2022</div>
+      <div class="position">Junior Software Engineer - Backend/DevOps</div>
+      <div class="company">Ananas E-commerce</div>
+    </div>
+    <div class="job-content">
+      <p>Started as Junior Developer and transitioned to backend/DevOps role.</p>
+      <ul class="achievements">
+        <li>✓ Gained experience with CI/CD, PostgreSQL, and DevOps practices</li>
+        <li>✓ Supported development team with infrastructure tasks</li>
+        <li>✓ Learned foundations of cloud technologies and automation</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="job">
+    <div class="job-header">
+      <div class="period">Nov 2021 - May 2022</div>
+      <div class="position">Junior Developer</div>
+      <div class="company">Ananas E-commerce</div>
+    </div>
+    <div class="job-content">
+      <p>Entry-level position where I started my professional journey in tech.</p>
+      <ul class="achievements">
+        <li>✓ Learned software development fundamentals</li>
+        <li>✓ Gained experience with version control and team collaboration</li>
+        <li>✓ Developed foundation for DevOps career path</li>
+      </ul>
+    </div>
+  </div>
+</div>`;
+      }
+    },
+
+    skills: {
+      description: 'Show technical skills',
+      action: () => {
+        return `
+<div class="skills-section">
+  <div class="skill-category">
+    <div class="category-title">☁️ Cloud Platforms</div>
+    <div class="skill-list">
+      <div class="skill-item"><span class="skill-name">AWS</span><div class="skill-bar"><div class="skill-fill" style="width: 95%"></div></div><span class="skill-percent">95%</span></div>
+      <div class="skill-item"><span class="skill-name">Azure</span><div class="skill-bar"><div class="skill-fill" style="width: 85%"></div></div><span class="skill-percent">85%</span></div>
+      <div class="skill-item"><span class="skill-name">GCP</span><div class="skill-bar"><div class="skill-fill" style="width: 80%"></div></div><span class="skill-percent">80%</span></div>
+    </div>
+  </div>
+
+  <div class="skill-category">
+    <div class="category-title">🐳 Containerization</div>
+    <div class="skill-list">
+      <div class="skill-item"><span class="skill-name">Docker</span><div class="skill-bar"><div class="skill-fill" style="width: 95%"></div></div><span class="skill-percent">95%</span></div>
+      <div class="skill-item"><span class="skill-name">Kubernetes</span><div class="skill-bar"><div class="skill-fill" style="width: 90%"></div></div><span class="skill-percent">90%</span></div>
+      <div class="skill-item"><span class="skill-name">Helm</span><div class="skill-bar"><div class="skill-fill" style="width: 85%"></div></div><span class="skill-percent">85%</span></div>
+    </div>
+  </div>
+
+  <div class="skill-category">
+    <div class="category-title">🏗️ Infrastructure as Code</div>
+    <div class="skill-list">
+      <div class="skill-item"><span class="skill-name">Terraform</span><div class="skill-bar"><div class="skill-fill" style="width: 95%"></div></div><span class="skill-percent">95%</span></div>
+      <div class="skill-item"><span class="skill-name">Ansible</span><div class="skill-bar"><div class="skill-fill" style="width: 90%"></div></div><span class="skill-percent">90%</span></div>
+      <div class="skill-item"><span class="skill-name">CloudFormation</span><div class="skill-bar"><div class="skill-fill" style="width: 85%"></div></div><span class="skill-percent">85%</span></div>
+    </div>
+  </div>
+
+  <div class="skill-category">
+    <div class="category-title">🔧 CI/CD & Monitoring</div>
+    <div class="skill-list">
+      <div class="skill-item"><span class="skill-name">Jenkins</span><div class="skill-bar"><div class="skill-fill" style="width: 90%"></div></div><span class="skill-percent">90%</span></div>
+      <div class="skill-item"><span class="skill-name">GitLab CI</span><div class="skill-bar"><div class="skill-fill" style="width: 95%"></div></div><span class="skill-percent">95%</span></div>
+      <div class="skill-item"><span class="skill-name">Prometheus</span><div class="skill-bar"><div class="skill-fill" style="width: 90%"></div></div><span class="skill-percent">90%</span></div>
+    </div>
+  </div>
+</div>`;
+      }
+    },
+
+    projects: {
+      description: 'Show featured projects',
+      action: () => {
+        return `
+<div class="projects-section">
+  <div class="project">
+    <div class="project-header">
+      <div class="project-icon">📊</div>
+      <div class="project-title">BlueGrid.io Data Analytics Platform</div>
+    </div>
+    <div class="project-description">
+      Designed and automated multi-account AWS infrastructure for large-scale data processing and media intelligence platform.
+    </div>
+    <div class="project-metrics">
+      <span class="metric">Multi-Account AWS</span>
+      <span class="metric">OIDC Authentication</span>
+      <span class="metric">Data Pipeline Automation</span>
+    </div>
+    <div class="tech-stack">
+      <span class="tech">Terraform Cloud</span>
+      <span class="tech">EKS</span>
+      <span class="tech">ArgoCD</span>
+      <span class="tech">Elastic ECK</span>
+      <span class="tech">New Relic</span>
+    </div>
+  </div>
+
+  <div class="project">
+    <div class="project-header">
+      <div class="project-icon">🏦</div>
+      <div class="project-title">Raiffeisen Bank Cloud Migration</div>
+    </div>
+    <div class="project-description">
+      Led cloud migration strategies for critical banking systems, ensuring security, compliance, and high availability on AWS.
+    </div>
+    <div class="project-metrics">
+      <span class="metric">Banking Compliance</span>
+      <span class="metric">High Availability</span>
+      <span class="metric">Automated Deployments</span>
+    </div>
+    <div class="tech-stack">
+      <span class="tech">AWS Multi-Account</span>
+      <span class="tech">Kubernetes</span>
+      <span class="tech">ArgoCD</span>
+      <span class="tech">Terraform</span>
+      <span class="tech">Cortex</span>
+      <span class="tech">Datadog</span>
+    </div>
+  </div>
+
+  <div class="project">
+    <div class="project-header">
+      <div class="project-icon">🛒</div>
+      <div class="project-title">Ananas E-commerce Infrastructure</div>
+    </div>
+    <div class="project-description">
+      Built and maintained microservices infrastructure with comprehensive CI/CD pipelines and monitoring solutions.
+    </div>
+    <div class="project-metrics">
+      <span class="metric">Microservices</span>
+      <span class="metric">GitHub Actions</span>
+      <span class="metric">24/7 Monitoring</span>
+    </div>
+    <div class="tech-stack">
+      <span class="tech">AWS</span>
+      <span class="tech">Kubernetes</span>
+      <span class="tech">Argo Workflows</span>
+      <span class="tech">SumoLogic</span>
+      <span class="tech">Sentry</span>
+      <span class="tech">PostgreSQL</span>
+    </div>
+  </div>
+</div>`;
+      }
+    },
+
+    contact: {
+      description: 'Get contact information',
+      action: () => {
+        return `
+<div class="contact-section">
+  <div class="contact-header">
+    <h3>📬 Let's Connect</h3>
+    <p>Ready to discuss your next DevOps project?</p>
+  </div>
+
+  <div class="contact-methods">
+    <div class="contact-item">
+      <div class="contact-icon">📧</div>
+      <div class="contact-details">
+        <div class="contact-label">Email</div>
+        <div class="contact-value">uros.orolicki@example.com</div>
+      </div>
+    </div>
+
+    <div class="contact-item">
+      <div class="contact-icon">💼</div>
+      <div class="contact-details">
+        <div class="contact-label">LinkedIn</div>
+        <div class="contact-value">linkedin.com/in/urosorolicki</div>
+      </div>
+    </div>
+
+    <div class="contact-item">
+      <div class="contact-icon">🐙</div>
+      <div class="contact-details">
+        <div class="contact-label">GitHub</div>
+        <div class="contact-value">github.com/urosorolicki</div>
+      </div>
+    </div>
+
+    <div class="contact-item">
+      <div class="contact-icon">📍</div>
+      <div class="contact-details">
+        <div class="contact-label">Location</div>
+        <div class="contact-value">Serbia (Remote Available)</div>
+      </div>
+    </div>
+  </div>
+</div>`;
+      }
+    },
+
+    resume: {
+      description: 'Download resume',
+      action: () => {
+        return `
+<div class="resume-section">
+  <div class="resume-header">
+    <div class="resume-icon">📄</div>
+    <h3>Resume Download</h3>
+  </div>
+  <p>Click the link below to download my latest resume:</p>
+  <a href="/UrosOrolicki.pdf" target="_blank" class="download-link">
+    📥 Download Resume (PDF)
+  </a>
+</div>`;
+      }
+    },
+
+    clear: {
+      description: 'Clear the terminal',
+      action: () => {
+        setHistory([]);
+        return null;
+      }
+    },
+
+    modern: {
+      description: 'Switch to modern portfolio',
+      action: () => {
+        window.location.href = '/modern-cv';
+        return 'Redirecting to modern portfolio...';
       }
     }
-  }, [mounted]);
+  };
 
-  // Detect mobile/touch devices
-  useEffect(() => {
-    if (mounted && typeof window !== "undefined") {
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                      ('ontouchstart' in window) || 
-                      (window.innerWidth <= 768);
-      setShowTouchHelper(isMobile);
+  const executeCommand = (cmd) => {
+    const trimmedCmd = cmd.trim().toLowerCase();
+    
+    if (trimmedCmd === '') return;
+
+    // Add to command history
+    setCommandHistory(prev => [...prev, cmd]);
+    setHistoryIndex(-1);
+
+    const newEntry = {
+      command: cmd,
+      output: null,
+      timestamp: new Date().toLocaleTimeString()
+    };
+
+    if (commands[trimmedCmd]) {
+      const output = commands[trimmedCmd].action();
+      if (output !== null) {
+        newEntry.output = output;
+      }
+    } else {
+      newEntry.output = `<div class="error">Command '${cmd}' not found. Type 'help' for available commands.</div>`;
     }
-  }, [mounted]);
 
-  // Focus input when terminal is clicked (especially useful on mobile)
-  const handleTerminalClick = useCallback(() => {
-    if (inputRef.current && !inputDisabled) {
+    if (trimmedCmd !== 'clear') {
+      setHistory(prev => [...prev, newEntry]);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      executeCommand(input);
+      setInput('');
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (commandHistory.length > 0) {
+        const newIndex = historyIndex === -1 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1);
+        setHistoryIndex(newIndex);
+        setInput(commandHistory[newIndex]);
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (historyIndex !== -1) {
+        const newIndex = historyIndex + 1;
+        if (newIndex >= commandHistory.length) {
+          setHistoryIndex(-1);
+          setInput('');
+        } else {
+          setHistoryIndex(newIndex);
+          setInput(commandHistory[newIndex]);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [inputDisabled]);
-
-  // Save history to localStorage whenever it changes
-  useEffect(() => {
-    if (mounted && typeof window !== "undefined") {
-      localStorage.setItem("terminal-history", JSON.stringify(history));
-    }
-  }, [history, mounted]);
-
-  const COMMANDS = useMemo(
-    () => ({
-      help: () => renderHelp(),
-      banner: () => renderBanner(),
-      about: () => renderAbout(),
-      skills: (args) => renderSkills(args),
-      experience: (args) => renderExperience(args),
-      projects: () => renderProjects(),
-      links: () => renderLinks(),
-      "download-cv": () => renderDownload(),
-      // New terminal-like commands
-      whoami: () => <div>{PROFILE.name.toLowerCase().replace(" ", "")}</div>,
-      pwd: () => <div>/home/{PROFILE.name.toLowerCase().replace(" ", "")}/portfolio</div>,
-      ls: (args) => {
-        const files = ["README.md", "skills.txt", "experience.json", "projects.md", "contacts.vcf"];
-        const showDetails = args.includes("-l") || args.includes("--long");
-        if (showDetails) {
-          return (
-            <div className="font-mono">
-              <div>total {files.length}</div>
-              {files.map((file, i) => (
-                <div key={i}>
-                  -rw-r--r-- 1 {PROFILE.name.toLowerCase().replace(" ", "")} staff {Math.floor(Math.random() * 9999 + 1000)} Oct {21 - i} 12:3{i} {file}
-                </div>
-              ))}
-            </div>
-          );
-        }
-        return <div className="flex flex-wrap gap-4">{files.map((f, i) => <span key={i} className="text-cyan-400">{f}</span>)}</div>;
-      },
-      cat: (args) => {
-        if (!args.length) return <div>cat: missing file operand</div>;
-        const file = args[0];
-        switch (file) {
-          case "skills.txt":
-            // Return plain text version of skills
-            const skillsText = Object.entries(PROFILE.skills)
-              .map(([category, skills]) => `${category.replace("_", "/")}: ${skills.join(", ")}`)
-              .join("\n");
-            return <pre className="whitespace-pre-wrap">{skillsText}</pre>;
-            
-          case "experience.json":
-            return <pre className="text-xs overflow-auto whitespace-pre-wrap">{JSON.stringify(PROFILE.experience, null, 2)}</pre>;
-            
-          case "README.md":
-            const readmeText = `# ${PROFILE.name}
-
-${PROFILE.summary}
-
-## Quick Start
-Type \`help\` to see available commands.
-
-## Skills
-${Object.entries(PROFILE.skills).map(([k, v]) => `- ${k.replace("_", "/")}: ${v.join(", ")}`).join("\n")}
-
-## Contact
-- Email: ${PROFILE.email}
-- Phone: ${PROFILE.phone}
-- Location: ${PROFILE.location}`;
-            return <pre className="whitespace-pre-wrap">{readmeText}</pre>;
-            
-          case "contacts.vcf":
-            const vcfText = `BEGIN:VCARD
-VERSION:3.0
-FN:${PROFILE.name}
-ORG:${PROFILE.title}
-EMAIL:${PROFILE.email}
-TEL:${PROFILE.phone}
-ADR:;;${PROFILE.location};;;;
-URL:${PROFILE.github}
-URL:${PROFILE.linkedin}
-END:VCARD`;
-            return <pre className="whitespace-pre-wrap">{vcfText}</pre>;
-            
-          case "projects.md":
-            const projectsText = `# Projects
-
-${PROFILE.projects.map(p => `## ${p.name}
-${p.desc}`).join("\n\n")}`;
-            return <pre className="whitespace-pre-wrap">{projectsText}</pre>;
-            
-          default:
-            return <div>cat: {file}: No such file or directory</div>;
-        }
-      },
-      grep: (args) => {
-        if (args.length < 1) return <div>grep: missing search pattern</div>;
-        const pattern = args[0].toLowerCase();
-        const results = [];
-        
-        // Search through skills
-        Object.entries(PROFILE.skills).forEach(([category, skills]) => {
-          skills.forEach(skill => {
-            if (skill.toLowerCase().includes(pattern)) {
-              results.push(`skills.txt:${category}: ${skill}`);
-            }
-          });
-        });
-        
-        // Search through experience
-        PROFILE.experience.forEach((exp, i) => {
-          if (exp.role.toLowerCase().includes(pattern) || 
-              exp.company.toLowerCase().includes(pattern) ||
-              exp.bullets.some(bullet => bullet.toLowerCase().includes(pattern))) {
-            results.push(`experience.json:${i}: ${exp.role} at ${exp.company}`);
-          }
-        });
-        
-        return results.length > 0 ? (
-          <div>{results.map((r, i) => <div key={i} className="text-yellow-400">{r}</div>)}</div>
-        ) : (
-          <div>grep: no matches found</div>
-        );
-      },
-      // Easter eggs
-      matrix: () => {
-        const chars = "01";
-        const matrix = Array.from({ length: 10 }, () => 
-          Array.from({ length: 50 }, () => chars[Math.floor(Math.random() * chars.length)]).join("")
-        );
-        return (
-          <div className="text-green-400 font-mono text-xs leading-tight">
-            {matrix.map((row, i) => <div key={i}>{row}</div>)}
-          </div>
-        );
-      },
-      quote: () => {
-        const quotes = [
-          "\"Code is like humor. When you have to explain it, it's bad.\" - Cory House",
-          "\"The best error message is the one that never shows up.\" - Thomas Fuchs",
-          "\"Any fool can write code that a computer can understand. Good programmers write code that humans can understand.\" - Martin Fowler",
-          "\"DevOps is not a team, it's a mindset.\" - Anonymous",
-        ];
-        return <div className="italic text-zinc-400">{quotes[Math.floor(Math.random() * quotes.length)]}</div>;
-      },
-      theme: () => {
-        setTheme(t => t === "dark" ? "light" : "dark");
-        return (
-          <div>
-            Theme toggled. Current: <b>{theme === "dark" ? "light" : "dark"}</b>
-          </div>
-        );
-      },
-      clear: () => null,
-    }),
-    [theme]
-  );
-
-  useEffect(() => {
-    if (mounted) {
-      pushOutput(renderBanner());
-      pushOutput(
-        <div className="mt-1">
-          Type <code>help</code> to get started.
-        </div>
-      );
-    }
-  }, [mounted]);
-
-  useEffect(() => {
-    scrollerRef.current?.scrollTo({ top: scrollerRef.current.scrollHeight, behavior: "smooth" });
-  }, [lines]);
-
-  const knownCommands = useMemo(() => Object.keys(COMMANDS), [COMMANDS]);
-
-  function pushOutput(node, useTypewriter = false) {
-    const lineId = ++idRef.current;
-    setLines((prev) => [...prev, { id: lineId, node, useTypewriter, isTyping: useTypewriter }]);
-    
-    if (useTypewriter) {
-      setIsTyping(true);
-      setInputDisabled(true);
-    }
-  }
-
-  const onTypewriterComplete = useCallback((lineId) => {
-    setLines(prev => prev.map(line => 
-      line.id === lineId ? { ...line, isTyping: false } : line
-    ));
-    setIsTyping(false);
-    setInputDisabled(false);
   }, []);
 
-  function parseCommand(cmdString) {
-    // Simple command parsing - splits on spaces but respects quotes
-    const args = [];
-    let current = '';
-    let inQuotes = false;
-    
-    for (let i = 0; i < cmdString.length; i++) {
-      const char = cmdString[i];
-      if (char === '"' || char === "'") {
-        inQuotes = !inQuotes;
-      } else if (char === ' ' && !inQuotes) {
-        if (current) {
-          args.push(current);
-          current = '';
-        }
-      } else {
-        current += char;
-      }
+  useEffect(() => {
+    if (outputRef.current) {
+      outputRef.current.scrollTop = outputRef.current.scrollHeight;
     }
-    
-    if (current) {
-      args.push(current);
-    }
-    
-    return {
-      command: args[0]?.toLowerCase() || '',
-      args: args.slice(1)
+  }, [history]);
+
+  useEffect(() => {
+    // Show welcome message
+    const welcomeMessage = {
+      command: 'welcome',
+      output: `
+<div class="welcome-section">
+  <div class="welcome-header">
+    <div class="terminal-title">🚀 Uroš Orolicki - DevOps Engineer Terminal</div>
+    <div class="welcome-subtitle">Welcome to my interactive CV terminal!</div>
+  </div>
+  <div class="welcome-content">
+    <p>Type <span class="highlight">help</span> to see available commands.</p>
+    <p>Navigate through my professional experience using terminal commands.</p>
+  </div>
+</div>`,
+      timestamp: new Date().toLocaleTimeString()
     };
-  }
-
-  function onRun(cmdRaw) {
-    const cmd = cmdRaw.trim();
-    if (!cmd) return;
-
-    // echo command
-    pushOutput(
-      <div className="flex items-start">
-        <Prompt theme={theme} />
-        <span className="whitespace-pre-wrap break-words">{cmd}</span>
-      </div>
-    );
-
-    setHistory((h) => (h[h.length - 1] === cmd ? h : [...h, cmd]));
-    setPointer(-1);
-    setInput("");
-
-    if (cmd === "clear") {
-      setLines([]);
-      return;
-    }
-
-    const { command, args } = parseCommand(cmd);
-    const fn = COMMANDS[command];
-    
-    if (fn) {
-      const output = fn(args);
-      if (output) {
-        // Use typewriter for text-based commands only
-        const useTypewriter = ['about', 'quote'].includes(command);
-        pushOutput(output, useTypewriter);
-      }
-    } else {
-      pushOutput(
-        <div>
-          Command not found: <b>{command}</b>. Try <code>help</code>.
-        </div>
-      );
-    }
-  }
-
-  function onKeyDown(e) {
-    if (inputDisabled) {
-      e.preventDefault();
-      return;
-    }
-
-    if (e.key === "Enter") {
-      onRun(input);
-      return;
-    }
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setPointer((p) => {
-        const next = p === -1 ? history.length - 1 : Math.max(0, p - 1);
-        setInput(history[next] ?? "");
-        return next;
-      });
-    }
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setPointer((p) => {
-        const next = p < history.length - 1 ? p + 1 : -1;
-        setInput(next === -1 ? "" : history[next]);
-        return next;
-      });
-    }
-    if (e.key === "Tab") {
-      e.preventDefault();
-      const words = input.split(' ');
-      const currentWord = words[words.length - 1];
-      
-      if (words.length === 1) {
-        // Autocomplete command
-        const matches = knownCommands.filter(c => c.startsWith(currentWord.toLowerCase()));
-        if (matches.length === 1) {
-          setInput(matches[0]);
-        } else if (matches.length > 1) {
-          // Find common prefix
-          let commonPrefix = matches[0];
-          for (let i = 1; i < matches.length; i++) {
-            while (!matches[i].startsWith(commonPrefix)) {
-              commonPrefix = commonPrefix.slice(0, -1);
-            }
-          }
-          
-          if (commonPrefix.length > currentWord.length) {
-            setInput(commonPrefix);
-          } else {
-            // Show all matches like real terminal
-            pushOutput(
-              <div className="grid grid-cols-3 gap-2 text-cyan-400">
-                {matches.map((match, i) => (
-                  <span key={i}>{match}</span>
-                ))}
-              </div>
-            );
-          }
-        }
-      } else {
-        // Autocomplete arguments for specific commands
-        const command = words[0];
-        if (command === 'skills') {
-          const categories = Object.keys(PROFILE.skills).map(k => k.toLowerCase().replace('_', '/'));
-          const matches = categories.filter(c => c.startsWith(currentWord.toLowerCase()));
-          if (matches.length === 1) {
-            words[words.length - 1] = matches[0];
-            setInput(words.join(' '));
-          } else if (matches.length > 1) {
-            pushOutput(
-              <div className="flex flex-wrap gap-2 text-yellow-400">
-                {matches.map((match, i) => (
-                  <span key={i}>{match}</span>
-                ))}
-              </div>
-            );
-          }
-        } else if (command === 'cat') {
-          const files = ['README.md', 'skills.txt', 'experience.json', 'projects.md', 'contacts.vcf'];
-          const matches = files.filter(f => f.toLowerCase().startsWith(currentWord.toLowerCase()));
-          if (matches.length === 1) {
-            words[words.length - 1] = matches[0];
-            setInput(words.join(' '));
-          } else if (matches.length > 1) {
-            pushOutput(
-              <div className="flex flex-wrap gap-2 text-cyan-400">
-                {matches.map((match, i) => (
-                  <span key={i}>{match}</span>
-                ))}
-              </div>
-            );
-          }
-        }
-      }
-    }
-  }
-
-  // Don't render until mounted to avoid hydration mismatch
-  if (!mounted) {
-    return <div className="min-h-screen bg-zinc-900" />; // Simple loading state
-  }
+    setHistory([welcomeMessage]);
+  }, []);
 
   return (
     <>
       <Head>
-        <title>{PROFILE.name} - {PROFILE.title}</title>
-        <meta name="description" content={PROFILE.summary} />
+        <title>Uroš Orolicki - DevOps Engineer Terminal</title>
+        <meta name="description" content="Interactive Terminal CV - DevOps Engineer" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </Head>
-      
-      <div style={{ 
-        minHeight: '100vh', 
-        backgroundColor: '#000000', 
-        color: '#ffffff',
-        fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
-        padding: '20px'
-      }}>
-        
-        {/* Terminal window */}
-        <div style={{ 
-          maxWidth: '800px', 
-          margin: '0 auto',
-          border: '2px solid #333',
-          backgroundColor: '#000'
-        }}>
-          {/* window chrome */}
-          <div style={{
-            padding: '10px',
-            borderBottom: '1px solid #333',
-            backgroundColor: '#111',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
-          }}>
-            <div style={{ display: 'flex', gap: '5px' }}>
-              <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ff5f56' }}></span>
-              <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ffbd2e' }}></span>
-              <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#27ca3f' }}></span>
+
+      <div className="terminal-container" onClick={() => inputRef.current?.focus()}>
+        <div className="terminal-window">
+          <div className="terminal-header">
+            <div className="terminal-controls">
+              <div className="control red"></div>
+              <div className="control yellow"></div>
+              <div className="control green"></div>
             </div>
-            <span style={{ fontSize: '12px', color: '#888' }}>terminal</span>
+            <div className="terminal-title">uroš@portfolio:~</div>
+            <div className="terminal-actions">
+              <button 
+                onClick={() => window.location.href = '/modern-cv'}
+                className="modern-btn"
+                title="Switch to Modern Portfolio"
+              >
+                Modern View
+              </button>
+            </div>
           </div>
 
-          {/* terminal content */}
-          <div
-            ref={scrollerRef}
-            onClick={handleTerminalClick}
-            className="terminal"
-            style={{
-              height: '500px',
-              overflowY: 'auto',
-              padding: '20px',
-              backgroundColor: '#000000',
-              color: '#ffffff',
-              fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
-              fontSize: '14px',
-              lineHeight: '1.3',
-              fontWeight: 'normal',
-              WebkitFontSmoothing: 'antialiased',
-              MozOsxFontSmoothing: 'grayscale'
-            }}
-          >
-            {lines.map((l) => (
-              <div key={l.id} style={{ marginBottom: '4px' }}>
-                {l.useTypewriter ? (
-                  <TypeWriter 
-                    text={l.node}
-                    speed={20}
-                    onComplete={() => onTypewriterComplete(l.id)}
-                  />
-                ) : (
-                  l.node
-                )}
+          <div className="terminal-body" ref={outputRef}>
+            <div className="terminal-content">
+              {history.map((entry, index) => (
+                <div key={index} className="terminal-entry">
+                  {entry.command !== 'welcome' && (
+                    <div className="command-line">
+                      <span className="prompt">
+                        <span className="user">uroš</span>
+                        <span className="separator">@</span>
+                        <span className="host">portfolio</span>
+                        <span className="separator">:</span>
+                        <span className="path">{currentPath}</span>
+                        <span className="prompt-symbol">$</span>
+                      </span>
+                      <span className="command-text">{entry.command}</span>
+                    </div>
+                  )}
+                  {entry.output && (
+                    <div 
+                      className="command-output" 
+                      dangerouslySetInnerHTML={{ __html: entry.output }} 
+                    />
+                  )}
+                </div>
+              ))}
+
+              <div className="input-line">
+                <span className="prompt">
+                  <span className="user">uroš</span>
+                  <span className="separator">@</span>
+                  <span className="host">portfolio</span>
+                  <span className="separator">:</span>
+                  <span className="path">{currentPath}</span>
+                  <span className="prompt-symbol">$</span>
+                </span>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  className="terminal-input"
+                  autoComplete="off"
+                  spellCheck="false"
+                />
               </div>
-            ))}
-
-            {/* input line */}
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Prompt theme={theme} />
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={onKeyDown}
-                disabled={inputDisabled}
-                style={{
-                  flex: '1',
-                  backgroundColor: 'transparent',
-                  outline: 'none',
-                  border: 'none',
-                  color: '#ffffff',
-                  fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
-                  fontSize: '14px',
-                  lineHeight: '1.3',
-                  fontWeight: 'normal',
-                  padding: '0',
-                  margin: '0',
-                  caretColor: '#4ade80',
-                  WebkitFontSmoothing: 'antialiased',
-                  MozOsxFontSmoothing: 'grayscale',
-                  opacity: inputDisabled ? 0.5 : 1
-                }}
-                autoFocus
-                aria-label="terminal input"
-              />
             </div>
           </div>
-
-          {/* touch helper */}
-          {showTouchHelper && (
-            <div style={{
-              textAlign: 'center',
-              padding: '10px',
-              backgroundColor: '#111',
-              fontSize: '12px',
-              color: '#666'
-            }}>
-              <div>Tap terminal to focus. Use virtual keyboard.</div>
-              <div style={{ marginTop: '5px' }}>Try: help, about, skills cloud</div>
-            </div>
-          )}
         </div>
+
+        <style jsx>{`
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+
+          .terminal-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            font-family: 'JetBrains Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+          }
+
+          .terminal-window {
+            width: 100%;
+            max-width: 1000px;
+            max-height: 90vh;
+            background: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+          }
+
+          .terminal-header {
+            background: #334155;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #475569;
+          }
+
+          .terminal-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+          }
+
+          .control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+          }
+
+          .control.red { background: #ef4444; }
+          .control.yellow { background: #f59e0b; }
+          .control.green { background: #10b981; }
+
+          .terminal-title {
+            color: #e2e8f0;
+            font-weight: 500;
+            font-size: 0.9rem;
+          }
+
+          .terminal-actions {
+            display: flex;
+            gap: 1rem;
+          }
+
+          .modern-btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+          }
+
+          .modern-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+          }
+
+          .terminal-body {
+            height: 70vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: #1e293b;
+          }
+
+          .terminal-body::-webkit-scrollbar {
+            width: 8px;
+          }
+
+          .terminal-body::-webkit-scrollbar-track {
+            background: #334155;
+          }
+
+          .terminal-body::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+          }
+
+          .terminal-body::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+          }
+
+          .terminal-entry {
+            margin-bottom: 1rem;
+          }
+
+          .command-line {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+          }
+
+          .input-line {
+            display: flex;
+            align-items: center;
+          }
+
+          .prompt {
+            display: flex;
+            align-items: center;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+          }
+
+          .user {
+            color: #10b981;
+            font-weight: 600;
+          }
+
+          .separator {
+            color: #64748b;
+            margin: 0 0.1rem;
+          }
+
+          .host {
+            color: #3b82f6;
+            font-weight: 600;
+          }
+
+          .path {
+            color: #8b5cf6;
+            font-weight: 500;
+          }
+
+          .prompt-symbol {
+            color: #e2e8f0;
+            margin-left: 0.3rem;
+            font-weight: bold;
+          }
+
+          .command-text {
+            color: #e2e8f0;
+            font-weight: 500;
+          }
+
+          .terminal-input {
+            background: transparent;
+            border: none;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            width: 100%;
+            caret-color: #3b82f6;
+          }
+
+          .command-output {
+            margin-left: 1rem;
+            padding: 1rem 0;
+            border-left: 2px solid #334155;
+            padding-left: 1rem;
+          }
+
+          /* Welcome Section */
+          .welcome-section {
+            padding: 1rem 0;
+          }
+
+          .welcome-header {
+            margin-bottom: 1.5rem;
+          }
+
+          .terminal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+          }
+
+          .welcome-subtitle {
+            color: #94a3b8;
+            font-size: 1rem;
+          }
+
+          .welcome-content p {
+            color: #e2e8f0;
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+          }
+
+          .highlight {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 600;
+          }
+
+          /* Help Section */
+          .help-section {
+            padding: 1rem 0;
+          }
+
+          .help-header {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 1rem;
+          }
+
+          .command-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 0.5rem;
+          }
+
+          .command-item {
+            padding: 0.5rem;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 6px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+          }
+
+          .cmd {
+            color: #60a5fa;
+            font-weight: 600;
+            margin-right: 0.5rem;
+          }
+
+          /* About Section */
+          .about-section {
+            padding: 1.5rem 0;
+          }
+
+          .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+          }
+
+          .avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+          }
+
+          .name {
+            color: #3b82f6;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+          }
+
+          .title {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            font-weight: 500;
+          }
+
+          .bio {
+            margin-bottom: 2rem;
+          }
+
+          .bio p {
+            color: #e2e8f0;
+            line-height: 1.7;
+            margin-bottom: 0.8rem;
+            font-size: 1.05rem;
+          }
+
+          .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+          }
+
+          .stat {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(139, 92, 246, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+          }
+
+          .stat .number {
+            display: block;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #8b5cf6;
+            margin-bottom: 0.3rem;
+          }
+
+          .stat .label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            font-weight: 500;
+          }
+
+          /* Experience Section */
+          .experience-section {
+            padding: 1rem 0;
+          }
+
+          .job {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.1);
+          }
+
+          .job-header {
+            margin-bottom: 1rem;
+          }
+
+          .period {
+            color: #10b981;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+          }
+
+          .position {
+            color: #3b82f6;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+          }
+
+          .company {
+            color: #94a3b8;
+            font-weight: 500;
+          }
+
+          .job-content p {
+            color: #e2e8f0;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+          }
+
+          .achievements {
+            list-style: none;
+            padding: 0;
+          }
+
+          .achievements li {
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+          }
+
+          /* Skills Section */
+          .skills-section {
+            padding: 1rem 0;
+          }
+
+          .skill-category {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(245, 158, 11, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(245, 158, 11, 0.1);
+          }
+
+          .category-title {
+            color: #f59e0b;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+          }
+
+          .skill-item {
+            display: grid;
+            grid-template-columns: 150px 1fr 60px;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.8rem;
+          }
+
+          .skill-name {
+            color: #e2e8f0;
+            font-weight: 500;
+          }
+
+          .skill-bar {
+            height: 8px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+          }
+
+          .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+          }
+
+          .skill-percent {
+            color: #f59e0b;
+            font-weight: 600;
+            text-align: right;
+          }
+
+          /* Projects Section */
+          .projects-section {
+            padding: 1rem 0;
+          }
+
+          .project {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(139, 92, 246, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+          }
+
+          .project-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+          }
+
+          .project-icon {
+            font-size: 2rem;
+          }
+
+          .project-title {
+            color: #8b5cf6;
+            font-size: 1.2rem;
+            font-weight: 600;
+          }
+
+          .project-description {
+            color: #e2e8f0;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+          }
+
+          .project-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+          }
+
+          .metric {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+          }
+
+          .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+          }
+
+          .tech {
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+          }
+
+          /* Contact Section */
+          .contact-section {
+            padding: 1.5rem 0;
+          }
+
+          .contact-header {
+            margin-bottom: 2rem;
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+          }
+
+          .contact-header h3 {
+            color: #3b82f6;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+          }
+
+          .contact-header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+          }
+
+          .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+          }
+
+          .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(16, 185, 129, 0.1);
+          }
+
+          .contact-icon {
+            font-size: 1.5rem;
+            width: 50px;
+            text-align: center;
+          }
+
+          .contact-label {
+            color: #10b981;
+            font-weight: 600;
+            font-size: 0.9rem;
+          }
+
+          .contact-value {
+            color: #e2e8f0;
+            font-weight: 500;
+          }
+
+          /* Resume Section */
+          .resume-section {
+            padding: 1.5rem;
+            background: rgba(139, 92, 246, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            text-align: center;
+          }
+
+          .resume-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+          }
+
+          .resume-icon {
+            font-size: 2rem;
+          }
+
+          .resume-section h3 {
+            color: #8b5cf6;
+            font-size: 1.3rem;
+            font-weight: 700;
+          }
+
+          .resume-section p {
+            color: #e2e8f0;
+            margin: 1rem 0;
+            line-height: 1.6;
+          }
+
+          .download-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+          }
+
+          .download-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+          }
+
+          /* Error Messages */
+          .error {
+            color: #ef4444;
+            font-weight: 500;
+            padding: 0.5rem;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+          }
+
+          /* Responsive Design */
+          @media (max-width: 768px) {
+            .terminal-container {
+              padding: 1rem;
+            }
+
+            .terminal-window {
+              max-height: 95vh;
+            }
+
+            .terminal-body {
+              height: 80vh;
+              padding: 1rem;
+            }
+
+            .terminal-header {
+              padding: 0.8rem 1rem;
+            }
+
+            .profile-header {
+              flex-direction: column;
+              text-align: center;
+            }
+
+            .stats-grid {
+              grid-template-columns: 1fr;
+            }
+
+            .contact-methods {
+              grid-template-columns: 1fr;
+            }
+
+            .skill-item {
+              grid-template-columns: 1fr;
+              gap: 0.5rem;
+            }
+
+            .skill-name {
+              margin-bottom: 0.3rem;
+            }
+
+            .project-metrics {
+              justify-content: center;
+            }
+
+            .command-list {
+              grid-template-columns: 1fr;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .terminal-header {
+              flex-direction: column;
+              gap: 1rem;
+            }
+
+            .name {
+              font-size: 1.5rem;
+            }
+
+            .avatar {
+              width: 60px;
+              height: 60px;
+              font-size: 1.4rem;
+            }
+          }
+        `}</style>
       </div>
     </>
   );
-}
+};
+
+export default ModernTerminalCV;
