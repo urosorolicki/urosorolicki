@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import Head from 'next/head';
+import BackgroundVideo from '../components/BackgroundVideo';
 
 // ===== Editable profile data =====
 const PROFILE = {
@@ -752,57 +753,28 @@ ${p.desc}`).join("\n\n")}`;
         <meta name="description" content={`${PROFILE.summary} - Terminal Interface`} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
+
+      <div className="terminal-root">
+        <BackgroundVideo overlayOpacity={0.55} />
       
-      <div style={{ 
-        minHeight: '100vh', 
-        backgroundColor: '#000000', 
-        color: '#ffffff',
-        fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
-        padding: '20px'
-      }}>
-        
+      <div className="terminal-page">
         {/* Terminal window */}
-        <div style={{ 
-          maxWidth: '800px', 
-          margin: '0 auto',
-          border: '2px solid #333',
-          backgroundColor: '#000'
-        }}>
+        <div className="terminal-window">
           {/* window chrome */}
-          <div style={{
-            padding: '10px',
-            borderBottom: '1px solid #333',
-            backgroundColor: '#111',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
-          }}>
-            <div style={{ display: 'flex', gap: '5px' }}>
-              <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ff5f56' }}></span>
-              <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ffbd2e' }}></span>
-              <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#27ca3f' }}></span>
+          <div className="terminal-header">
+            <div className="terminal-header__dots">
+              <span className="dot dot--red"></span>
+              <span className="dot dot--amber"></span>
+              <span className="dot dot--green"></span>
             </div>
-            <span style={{ fontSize: '12px', color: '#888' }}>terminal - retro mode</span>
+            <span className="terminal-header__title">terminal - retro mode</span>
           </div>
 
           {/* terminal content */}
           <div
             ref={scrollerRef}
             onClick={handleTerminalClick}
-            className="terminal"
-            style={{
-              height: '500px',
-              overflowY: 'auto',
-              padding: '20px',
-              backgroundColor: '#000000',
-              color: '#ffffff',
-              fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
-              fontSize: '14px',
-              lineHeight: '1.3',
-              fontWeight: 'normal',
-              WebkitFontSmoothing: 'antialiased',
-              MozOsxFontSmoothing: 'grayscale'
-            }}
+            className="terminal-body terminal"
           >
             {lines.map((l) => (
               <div key={l.id} style={{ marginBottom: '4px' }}>
@@ -819,7 +791,7 @@ ${p.desc}`).join("\n\n")}`;
             ))}
 
             {/* input line */}
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div className="input-row">
               <Prompt theme={theme} />
               <input
                 ref={inputRef}
@@ -827,23 +799,7 @@ ${p.desc}`).join("\n\n")}`;
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
                 disabled={inputDisabled}
-                style={{
-                  flex: '1',
-                  backgroundColor: 'transparent',
-                  outline: 'none',
-                  border: 'none',
-                  color: '#ffffff',
-                  fontFamily: 'Consolas, Monaco, "Lucida Console", monospace',
-                  fontSize: '14px',
-                  lineHeight: '1.3',
-                  fontWeight: 'normal',
-                  padding: '0',
-                  margin: '0',
-                  caretColor: '#4ade80',
-                  WebkitFontSmoothing: 'antialiased',
-                  MozOsxFontSmoothing: 'grayscale',
-                  opacity: inputDisabled ? 0.5 : 1
-                }}
+                className={`terminal-input ${inputDisabled ? 'terminal-input--disabled' : ''}`}
                 autoFocus
                 aria-label="terminal input"
               />
@@ -852,18 +808,191 @@ ${p.desc}`).join("\n\n")}`;
 
           {/* touch helper */}
           {showTouchHelper && (
-            <div style={{
-              textAlign: 'center',
-              padding: '10px',
-              backgroundColor: '#111',
-              fontSize: '12px',
-              color: '#666'
-            }}>
+            <div className="touch-helper">
               <div>Tap terminal to focus. Use virtual keyboard.</div>
-              <div style={{ marginTop: '5px' }}>Try: help, about, skills cloud, modern</div>
+              <div className="touch-helper__hint">Try: help, about, skills cloud, modern</div>
             </div>
           )}
         </div>
+        <style jsx>{`
+          .terminal-root {
+            position: relative;
+            min-height: 100vh;
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .terminal-page {
+            min-height: 100vh;
+            padding: clamp(1rem, 5vw, 3rem);
+            padding-top: calc(env(safe-area-inset-top, 0px) + clamp(1.25rem, 5.5vw, 3.5rem));
+            position: relative;
+            color: #ffffff;
+            font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+          }
+
+          .terminal-page::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at top, rgba(15, 23, 42, 0.2), rgba(2, 6, 23, 0.8));
+            z-index: -1;
+          }
+
+          .terminal-window {
+            width: min(100%, 960px);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid #1f2937;
+            border-radius: 12px;
+            background: #020617;
+            box-shadow: 0 35px 60px -25px rgba(15, 23, 42, 0.85);
+            overflow: hidden;
+          }
+
+          .terminal-header {
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid #1f2937;
+            background: linear-gradient(90deg, #0f172a 0%, #121a2d 100%);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+          }
+
+          .terminal-header__dots {
+            display: flex;
+            gap: 0.4rem;
+          }
+
+          .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+          }
+
+          .dot--red { background: #ff5f56; }
+          .dot--amber { background: #ffbd2e; }
+          .dot--green { background: #27c93f; }
+
+          .terminal-header__title {
+            font-size: 0.8rem;
+            color: #94a3b8;
+          }
+
+          .terminal-body {
+            flex: 1;
+            min-height: 360px;
+            max-height: clamp(420px, 70vh, 640px);
+            overflow-y: auto;
+            padding: clamp(1rem, 3vw, 2rem);
+            font-size: clamp(0.85rem, 1vw, 0.95rem);
+            line-height: 1.4;
+            background: #000000;
+          }
+
+          .terminal-body::-webkit-scrollbar {
+            width: 10px;
+          }
+
+          .terminal-body::-webkit-scrollbar-track {
+            background: #0f172a;
+          }
+
+          .terminal-body::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 999px;
+          }
+
+          .input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding-top: 0.5rem;
+          }
+
+          .terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: 1.4;
+            caret-color: #4ade80;
+          }
+
+          .terminal-input--disabled {
+            opacity: 0.35;
+          }
+
+          .touch-helper {
+            text-align: center;
+            padding: 0.85rem;
+            background: #0f172a;
+            border-top: 1px solid #1f2937;
+            font-size: 0.75rem;
+            color: #94a3b8;
+          }
+
+          .touch-helper__hint {
+            margin-top: 0.35rem;
+            color: #e2e8f0;
+            font-weight: 500;
+          }
+
+          @media (max-width: 768px) {
+            .terminal-page {
+              padding: 1rem;
+              align-items: flex-start;
+              padding-top: calc(env(safe-area-inset-top, 0px) + 1.5rem);
+            }
+
+            .terminal-window {
+              border-radius: 8px;
+              max-height: none;
+            }
+
+            .terminal-header {
+              flex-direction: row;
+              justify-content: space-between;
+            }
+
+            .terminal-body {
+              max-height: none;
+              height: 65vh;
+              min-height: 320px;
+              font-size: 0.85rem;
+            }
+
+            .input-row {
+              flex-wrap: wrap;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .terminal-header__title {
+              font-size: 0.7rem;
+            }
+
+            .terminal-body {
+              padding: 0.85rem;
+              height: 60vh;
+            }
+
+            .input-row {
+              flex-direction: column;
+              align-items: flex-start;
+            }
+          }
+        `}</style>
+      </div>
       </div>
     </>
   );

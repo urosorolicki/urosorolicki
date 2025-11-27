@@ -406,7 +406,91 @@ const ModernTerminalCV = () => {
           setInput(commandHistory[newIndex]);
         }
       }
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      
+      const availableCommands = Object.keys(commands);
+      const currentInput = input.trim();
+      
+      if (currentInput === '') {
+        // Show all commands if input is empty
+        const helpOutput = `
+<div class="autocomplete-help">
+  <div class="help-header">💡 Available Commands:</div>
+  <div class="commands-grid">
+    ${availableCommands.map(cmd => `<span class="cmd-suggestion">${cmd}</span>`).join('')}
+  </div>
+  <div class="help-tip">Type a few letters and press Tab to autocomplete</div>
+</div>`;
+        
+        const newEntry = {
+          command: '',
+          output: helpOutput,
+          timestamp: new Date().toLocaleTimeString()
+        };
+        setHistory(prev => [...prev, newEntry]);
+        return;
+      }
+      
+      // Find matching commands
+      const matches = availableCommands.filter(cmd => 
+        cmd.toLowerCase().startsWith(currentInput.toLowerCase())
+      );
+      
+      if (matches.length === 1) {
+        // Single match - autocomplete
+        setInput(matches[0]);
+      } else if (matches.length > 1) {
+        // Multiple matches - show suggestions
+        const commonPrefix = getCommonPrefix(matches);
+        if (commonPrefix.length > currentInput.length) {
+          setInput(commonPrefix);
+        } else {
+          const suggestionsOutput = `
+<div class="autocomplete-suggestions">
+  <div class="suggestions-header">📝 Did you mean:</div>
+  <div class="suggestions-grid">
+    ${matches.map(cmd => `<span class="cmd-suggestion" onclick="document.querySelector('.terminal-input').value='${cmd}'">${cmd}</span>`).join('')}
+  </div>
+</div>`;
+          
+          const newEntry = {
+            command: currentInput,
+            output: suggestionsOutput,
+            timestamp: new Date().toLocaleTimeString()
+          };
+          setHistory(prev => [...prev, newEntry]);
+        }
+      } else {
+        // No matches
+        const noMatchOutput = `
+<div class="no-match">
+  <span class="error-icon">❌</span> No commands found starting with "${currentInput}"
+  <div class="available-commands">Available: ${availableCommands.join(', ')}</div>
+</div>`;
+        
+        const newEntry = {
+          command: currentInput,
+          output: noMatchOutput,
+          timestamp: new Date().toLocaleTimeString()
+        };
+        setHistory(prev => [...prev, newEntry]);
+      }
     }
+  };
+  
+  // Helper function to find common prefix
+  const getCommonPrefix = (strings) => {
+    if (strings.length === 0) return '';
+    
+    let prefix = strings[0];
+    for (let i = 1; i < strings.length; i++) {
+      while (strings[i].indexOf(prefix) !== 0) {
+        prefix = prefix.substring(0, prefix.length - 1);
+        if (prefix === '') return '';
+      }
+    }
+    return prefix;
   };
 
   useEffect(() => {
@@ -447,7 +531,7 @@ const ModernTerminalCV = () => {
         <title>Uroš Orolicki - DevOps Engineer Terminal</title>
         <meta name="description" content="Interactive Terminal CV - DevOps Engineer" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
       </Head>
 
       <div className="terminal-container" onClick={() => inputRef.current?.focus()}>
@@ -1123,6 +1207,72 @@ const ModernTerminalCV = () => {
           .download-link:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+          }
+
+          /* Autocomplete Styles */
+          .autocomplete-help,
+          .autocomplete-suggestions {
+            padding: 1rem;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            margin: 0.5rem 0;
+          }
+
+          .help-header,
+          .suggestions-header {
+            color: #3b82f6;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+          }
+
+          .commands-grid,
+          .suggestions-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+          }
+
+          .cmd-suggestion {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+          }
+
+          .cmd-suggestion:hover {
+            background: rgba(16, 185, 129, 0.2);
+            transform: translateY(-1px);
+          }
+
+          .help-tip {
+            color: #64748b;
+            font-size: 0.85rem;
+            font-style: italic;
+          }
+
+          .no-match {
+            padding: 1rem;
+            background: rgba(239, 68, 68, 0.05);
+            border-radius: 6px;
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            text-align: center;
+          }
+
+          .error-icon {
+            margin-right: 0.5rem;
+          }
+
+          .available-commands {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
           }
 
           /* Error Messages */
