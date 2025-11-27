@@ -1,41 +1,84 @@
 export default async function handler(req, res) {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
-    const { name, email, message, subject } = req.body;
+    console.log('📥 Contact form request received:', {
+      method: req.method,
+      body: req.body ? 'Present' : 'Missing',
+      headers: req.headers ? 'Present' : 'Missing'
+    });
+
+    const { name, email, subject, message } = req.body;
 
     // Basic validation
     if (!name || !email || !message) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Name, email, and message are required' 
+      console.log('❌ Validation failed: Missing required fields');
+      return res.status(400).json({
+        success: false,
+        message: 'Name, email, and message are required fields.'
       });
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid email format' 
+      console.log('❌ Validation failed: Invalid email format');
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address.'
       });
     }
 
-    // Rate limiting check (simple implementation)
-    const userAgent = req.headers['user-agent'];
-    const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    
+    // Check if Resend API key is available
+    if (!process.env.RESEND_API_KEY) {
+      console.error('❌ RESEND_API_KEY environment variable is not set');
+      return res.status(500).json({
+        success: false,
+        message: 'Email service configuration error. Please contact the administrator.'
+      });
+    }
+
+    console.log('🔑 Resend API key is present');
+
     // Send email using Resend
     const { Resend } = require('resend');
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    await resend.emails.send({
-      from: 'onboarding@resend.dev', // Using Resend's sandbox domain
-      to: ['orolickiiuros@gmail.com'],
-      subject: `Portfolio Contact: ${subject || 'New Message'}`,
-      html: `
+    // Get client info for logging
+    const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
+    const userAgent = req.headers['user-agent'] || 'unknown';
+
+    // Create email templates
+    const textTemplate = `
+New Portfolio Contact Message
+
+Name: ${name}
+Email: ${email}
+Subject: ${subject || 'No subject provided'}
+
+Message:
+${message}
+
+---
+Request Details:
+IP: ${clientIP}
+User Agent: ${userAgent}
+Timestamp: ${new Date().toISOString()}
+    `.trim();
+
+    const htmlTemplate = `
         <!DOCTYPE html>
         <html>
           <head>
@@ -81,33 +124,80 @@ export default async function handler(req, res) {
             </div>
           </body>
         </html>
-      `
-    });
-    // Log successful email sending
-    console.log('✅ Email sent successfully via Resend:', {
-      name,
-      email,
-      subject: subject || 'No subject',
-      timestamp: new Date().toISOString(),
-      ip: clientIP
-    });
+      `;
 
-    res.status(200).json({
-      success: true,
-      message: 'Thank you for your message! I\'ll get back to you soon.',
-      data: {
+    console.log('📧 Attempting to send email with Resend...');
+    console.log('From: onboarding@resend.dev');
+    console.log('To: uros.orolicki@gmail.com');
+    console.log('Subject:', `New Contact Form Message from ${name}`);
+
+    try {
+      const data = await resend.emails.send({
+        from: 'onboarding@resend.dev',
+        to: ['uros.orolicki@gmail.com'],
+        subject: `New Contact Form Message from ${name}`,
+        html: htmlTemplate,
+        text: textTemplate
+      });
+
+      console.log('✅ Email sent successfully via Resend:', {
+        id: data.id,
         name,
-        timestamp: new Date().toISOString()
+        email,
+        subject: subject || 'No subject',
+        timestamp: new Date().toISOString(),
+        ip: clientIP
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Thank you for your message! I\'ll get back to you soon.',
+        data: {
+          name,
+          timestamp: new Date().toISOString(),
+          id: data.id
+        }
+      });
+
+    } catch (emailError) {
+      console.error('❌ Resend error details:', {
+        message: emailError.message,
+        stack: emailError.stack,
+        code: emailError.code || 'unknown',
+        statusCode: emailError.statusCode || 'unknown',
+        name: emailError.name || 'unknown',
+        timestamp: new Date().toISOString(),
+        apiKey: process.env.RESEND_API_KEY ? 'Present' : 'Missing'
+      });
+
+      // More specific error messages
+      let userMessage = 'Failed to send message. Please try again later.';
+      if (emailError.message?.includes('API key')) {
+        userMessage = 'Email service configuration error. Please contact the administrator.';
+      } else if (emailError.message?.includes('domain')) {
+        userMessage = 'Email domain not verified. Please contact the administrator.';
+      } else if (emailError.statusCode === 422) {
+        userMessage = 'Invalid email data. Please check your inputs and try again.';
       }
-    });
+
+      return res.status(500).json({
+        success: false,
+        message: userMessage,
+        error: process.env.NODE_ENV === 'development' ? emailError.message : 'Internal server error'
+      });
+    }
 
   } catch (error) {
-    console.error('❌ Contact form error:', error);
+    console.error('❌ General contact form error:', {
+      message: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString()
+    });
     
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Something went wrong. Please try again later.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
     });
   }
 }
