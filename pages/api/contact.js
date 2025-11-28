@@ -147,13 +147,13 @@ Timestamp: ${new Date().toISOString()}
 
     console.log('📧 Attempting to send email with Resend...');
     console.log('From: onboarding@resend.dev');
-    console.log('To: uros.orolicki@gmail.com');
+    console.log('To: orolickiiuros@gmail.com');
     console.log('Subject:', `New Contact Form Message from ${name}`);
 
     try {
       const data = await resend.emails.send({
         from: 'onboarding@resend.dev',
-        to: ['uros.orolicki@gmail.com'],
+        to: ['orolickiiuros@gmail.com'],
         subject: `New Contact Form Message from ${name}`,
         html: htmlTemplate,
         text: textTemplate
