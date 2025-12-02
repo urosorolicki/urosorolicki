@@ -531,30 +531,28 @@ const ModernCV = () => {
           /* Navigation */
           .main-nav {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 20px;
+            right: 20px;
             z-index: 1000;
-            backdrop-filter: blur(8px);
-            background: rgba(15, 23, 42, 0.4);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 2rem;
-            min-height: 50px;
-            transition: all 0.3s ease;
-          }
-          
-          .main-nav:hover {
-            backdrop-filter: blur(15px);
-            background: rgba(15, 23, 42, 0.7);
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-end;
           }
 
           .nav-brand {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
             font-size: 1.5rem;
             font-weight: 700;
             color: #ffffff;
+            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.6);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
           }
 
           .brand-text {
@@ -566,61 +564,36 @@ const ModernCV = () => {
 
           .nav-links {
             display: flex;
-            gap: 1rem;
-            align-items: center;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-end;
           }
 
           .nav-toggle {
             display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 42px;
-            height: 32px;
-            padding: 6px 10px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-            transition: all 0.3s ease;
-          }
-
-          .nav-toggle span {
-            display: block;
-            width: 100%;
-            height: 2px;
-            background: #ffffff;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-          }
-
-          .nav-toggle.open span:nth-child(1) {
-            transform: translateY(7px) rotate(45deg);
-          }
-
-          .nav-toggle.open span:nth-child(2) {
-            opacity: 0;
-          }
-
-          .nav-toggle.open span:nth-child(3) {
-            transform: translateY(-7px) rotate(-45deg);
           }
 
           .nav-link {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.8rem;
             font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: inherit;
+            min-width: 80px;
+            text-align: center;
           }
 
           .nav-link:hover,
           .nav-link.active {
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
           }
 
           .nav-actions {
@@ -647,11 +620,11 @@ const ModernCV = () => {
 
           /* Section Styles */
           section {
-            padding: clamp(90px, 12vw, 130px) clamp(1.25rem, 4vw, 2.5rem) clamp(50px, 8vw, 80px);
+            padding: clamp(40px, 6vw, 60px) clamp(1.25rem, 4vw, 2.5rem) clamp(30px, 4vw, 50px);
             max-width: 1200px;
             width: 100%;
             margin: 0 auto;
-            scroll-margin-top: 90px;
+            scroll-margin-top: 20px;
           }
 
           .section-header {
@@ -1078,114 +1051,32 @@ const ModernCV = () => {
             opacity: 0.8;
           }
 
-          /* Responsive Navigation */
-          @media (max-width: 1024px) {
-            .main-nav {
-              padding: 0.5rem 1.5rem;
-              flex-wrap: wrap;
-              gap: 0.4rem;
-              min-height: 45px;
-            }
-
-            .nav-toggle {
-              display: flex;
-            }
-
-            .nav-links {
-              order: 3;
-              width: 100%;
-              justify-content: center;
-              flex-wrap: wrap;
-              gap: 0.5rem;
-              max-height: 0;
-              overflow: hidden;
-              padding-top: 0;
-              transition: max-height 0.3s ease;
-            }
-
-            .nav-links.open {
-              max-height: 180px;
-              padding-top: 0.5rem;
-            }
-
-            .nav-actions {
-              order: 2;
-              width: 100%;
-              display: flex;
-              justify-content: flex-end;
-            }
-          }
-
-          /* Mobile First Responsive Design */
+          /* Mobile Responsive */
           @media (max-width: 768px) {
-            .main-nav {
-              padding: 0.4rem 1rem;
-              min-height: 42px;
-              background: rgba(15, 23, 42, 0.2);
-              backdrop-filter: blur(5px);
-            }
-            
-            .main-nav:hover {
-              background: rgba(15, 23, 42, 0.5);
-              backdrop-filter: blur(10px);
-            }
-
             .nav-brand {
-              font-size: 1.1rem;
-              margin-bottom: 0;
-              flex: 1;
-            }
-
-            .nav-toggle {
-              width: 32px;
-              height: 24px;
-              padding: 3px 6px;
-            }
-
-            .nav-links {
-              flex-direction: row;
-              flex-wrap: wrap;
-              align-items: center;
-              justify-content: center;
-              gap: 0.4rem;
-            }
-
-            .nav-links.open {
-              max-height: 100px;
-              padding-top: 0.3rem;
-              padding-bottom: 0.3rem;
+              font-size: 1.2rem;
+              padding: 0.4rem 0.8rem;
             }
 
             .nav-link {
+              font-size: 0.75rem;
               padding: 0.3rem 0.6rem;
-              font-size: 0.8rem;
-              border-radius: 15px;
-              flex: 0 0 auto;
-            }
-
-            .nav-actions {
-              justify-content: center;
-              margin-top: 0.2rem;
+              min-width: 70px;
             }
 
             .terminal-btn {
-              padding: 0.3rem 0.8rem;
               font-size: 0.75rem;
-              border-radius: 15px;
+              padding: 0.3rem 0.6rem;
             }
 
             section {
-              padding: 65px 1.25rem 30px;
-            }
-
-            section + section {
-              padding-top: 30px;
+              padding: 2rem 1.25rem;
             }
 
             .hero-section {
-              min-height: auto;
-              padding-top: 75px;
+              padding-top: 2rem;
             }
+          }
 
             .hero-content {
               grid-template-columns: 1fr;
