@@ -541,8 +541,8 @@ const ModernCV = () => {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 2rem;
-            min-height: 60px;
+            padding: 0.5rem 2rem;
+            min-height: 50px;
           }
 
           .nav-brand {
@@ -1075,10 +1075,10 @@ const ModernCV = () => {
           /* Responsive Navigation */
           @media (max-width: 1024px) {
             .main-nav {
-              padding: 0.75rem 1.5rem;
+              padding: 0.5rem 1.5rem;
               flex-wrap: wrap;
-              gap: 0.5rem;
-              min-height: 60px;
+              gap: 0.4rem;
+              min-height: 45px;
             }
 
             .nav-toggle {
@@ -1113,20 +1113,20 @@ const ModernCV = () => {
           /* Mobile First Responsive Design */
           @media (max-width: 768px) {
             .main-nav {
-              padding: 0.5rem 1rem;
-              min-height: 50px;
+              padding: 0.4rem 1rem;
+              min-height: 42px;
             }
 
             .nav-brand {
-              font-size: 1.25rem;
+              font-size: 1.1rem;
               margin-bottom: 0;
               flex: 1;
             }
 
             .nav-toggle {
-              width: 36px;
-              height: 28px;
-              padding: 4px 8px;
+              width: 32px;
+              height: 24px;
+              padding: 3px 6px;
             }
 
             .nav-links {
@@ -1138,40 +1138,40 @@ const ModernCV = () => {
             }
 
             .nav-links.open {
-              max-height: 120px;
-              padding-top: 0.5rem;
-              padding-bottom: 0.5rem;
+              max-height: 100px;
+              padding-top: 0.3rem;
+              padding-bottom: 0.3rem;
             }
 
             .nav-link {
-              padding: 0.4rem 0.8rem;
-              font-size: 0.85rem;
-              border-radius: 20px;
+              padding: 0.3rem 0.6rem;
+              font-size: 0.8rem;
+              border-radius: 15px;
               flex: 0 0 auto;
             }
 
             .nav-actions {
               justify-content: center;
-              margin-top: 0.25rem;
+              margin-top: 0.2rem;
             }
 
             .terminal-btn {
-              padding: 0.4rem 1rem;
-              font-size: 0.8rem;
-              border-radius: 20px;
+              padding: 0.3rem 0.8rem;
+              font-size: 0.75rem;
+              border-radius: 15px;
             }
 
             section {
-              padding: 80px 1.25rem 40px;
+              padding: 65px 1.25rem 30px;
             }
 
             section + section {
-              padding-top: 40px;
+              padding-top: 30px;
             }
 
             .hero-section {
               min-height: auto;
-              padding-top: 100px;
+              padding-top: 75px;
             }
 
             .hero-content {
