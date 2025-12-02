@@ -535,14 +535,20 @@ const ModernCV = () => {
             left: 0;
             right: 0;
             z-index: 1000;
-            backdrop-filter: blur(20px);
-            background: rgba(15, 23, 42, 0.95);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            background: rgba(15, 23, 42, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0.5rem 2rem;
             min-height: 50px;
+            transition: all 0.3s ease;
+          }
+          
+          .main-nav:hover {
+            backdrop-filter: blur(15px);
+            background: rgba(15, 23, 42, 0.7);
           }
 
           .nav-brand {
@@ -601,7 +607,7 @@ const ModernCV = () => {
           .nav-link {
             background: none;
             border: none;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.7);
             font-size: 0.9rem;
             font-weight: 500;
             padding: 0.5rem 1rem;
@@ -614,7 +620,7 @@ const ModernCV = () => {
           .nav-link:hover,
           .nav-link.active {
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
           }
 
           .nav-actions {
@@ -1115,6 +1121,13 @@ const ModernCV = () => {
             .main-nav {
               padding: 0.4rem 1rem;
               min-height: 42px;
+              background: rgba(15, 23, 42, 0.2);
+              backdrop-filter: blur(5px);
+            }
+            
+            .main-nav:hover {
+              background: rgba(15, 23, 42, 0.5);
+              backdrop-filter: blur(10px);
             }
 
             .nav-brand {
