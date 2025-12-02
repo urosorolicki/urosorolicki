@@ -531,28 +531,24 @@ const ModernCV = () => {
           /* Navigation */
           .main-nav {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 0;
+            left: 0;
+            right: 0;
             z-index: 1000;
+            backdrop-filter: blur(15px);
+            background: rgba(15, 23, 42, 0.85);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            align-items: flex-end;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            min-height: 70px;
           }
 
           .nav-brand {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
             font-size: 1.5rem;
             font-weight: 700;
             color: #ffffff;
-            backdrop-filter: blur(10px);
-            background: rgba(15, 23, 42, 0.6);
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
           }
 
           .brand-text {
@@ -564,36 +560,60 @@ const ModernCV = () => {
 
           .nav-links {
             display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            align-items: flex-end;
+            gap: 1rem;
+            align-items: center;
           }
 
           .nav-toggle {
             display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 24px;
+            padding: 3px 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          }
+
+          .nav-toggle span {
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: #ffffff;
+            transition: all 0.3s ease;
+          }
+
+          .nav-toggle.open span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+          }
+
+          .nav-toggle.open span:nth-child(2) {
+            opacity: 0;
+          }
+
+          .nav-toggle.open span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
           }
 
           .nav-link {
-            backdrop-filter: blur(10px);
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.8rem;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
             font-weight: 500;
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: inherit;
-            min-width: 80px;
-            text-align: center;
           }
 
           .nav-link:hover,
           .nav-link.active {
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.15);
-            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.1);
           }
 
           .nav-actions {
@@ -620,11 +640,11 @@ const ModernCV = () => {
 
           /* Section Styles */
           section {
-            padding: clamp(40px, 6vw, 60px) clamp(1.25rem, 4vw, 2.5rem) clamp(30px, 4vw, 50px);
+            padding: clamp(120px, 12vw, 150px) clamp(1.25rem, 4vw, 2.5rem) clamp(50px, 8vw, 80px);
             max-width: 1200px;
             width: 100%;
             margin: 0 auto;
-            scroll-margin-top: 20px;
+            scroll-margin-top: 90px;
           }
 
           .section-header {
@@ -1053,28 +1073,62 @@ const ModernCV = () => {
 
           /* Mobile Responsive */
           @media (max-width: 768px) {
-            .nav-brand {
-              font-size: 1.2rem;
-              padding: 0.4rem 0.8rem;
+            .main-nav {
+              padding: 1rem 1.5rem;
+              min-height: 60px;
+            }
+
+            .nav-toggle {
+              display: flex;
+            }
+
+            .nav-links {
+              position: absolute;
+              top: 100%;
+              left: 0;
+              right: 0;
+              flex-direction: column;
+              background: rgba(15, 23, 42, 0.95);
+              backdrop-filter: blur(15px);
+              border-top: 1px solid rgba(255, 255, 255, 0.1);
+              max-height: 0;
+              overflow: hidden;
+              transition: max-height 0.3s ease;
+            }
+
+            .nav-links.open {
+              max-height: 300px;
+              padding: 1rem 0;
             }
 
             .nav-link {
-              font-size: 0.75rem;
-              padding: 0.3rem 0.6rem;
-              min-width: 70px;
+              padding: 0.75rem 1.5rem;
+              text-align: center;
+              border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             }
 
-            .terminal-btn {
-              font-size: 0.75rem;
-              padding: 0.3rem 0.6rem;
+            .nav-actions {
+              position: absolute;
+              top: 100%;
+              left: 0;
+              right: 0;
+              background: rgba(15, 23, 42, 0.95);
+              backdrop-filter: blur(15px);
+              padding: 1rem 1.5rem;
+              border-top: 1px solid rgba(255, 255, 255, 0.1);
+              display: none;
+            }
+
+            .nav-links.open + .nav-actions {
+              display: block;
             }
 
             section {
-              padding: 2rem 1.25rem;
+              padding: 100px 1.5rem 60px;
             }
 
             .hero-section {
-              padding-top: 2rem;
+              padding-top: 120px;
             }
           }
 
