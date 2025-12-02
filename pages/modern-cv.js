@@ -541,8 +541,8 @@ const ModernCV = () => {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 2rem;
-            min-height: 70px;
+            padding: 0.75rem 2rem;
+            min-height: 60px;
           }
 
           .nav-brand {
@@ -1075,9 +1075,10 @@ const ModernCV = () => {
           /* Responsive Navigation */
           @media (max-width: 1024px) {
             .main-nav {
-              padding: 1rem 1.5rem;
+              padding: 0.75rem 1.5rem;
               flex-wrap: wrap;
-              gap: 0.75rem;
+              gap: 0.5rem;
+              min-height: 60px;
             }
 
             .nav-toggle {
@@ -1089,7 +1090,7 @@ const ModernCV = () => {
               width: 100%;
               justify-content: center;
               flex-wrap: wrap;
-              gap: 0.75rem;
+              gap: 0.5rem;
               max-height: 0;
               overflow: hidden;
               padding-top: 0;
@@ -1097,7 +1098,7 @@ const ModernCV = () => {
             }
 
             .nav-links.open {
-              max-height: 320px;
+              max-height: 180px;
               padding-top: 0.5rem;
             }
 
@@ -1112,47 +1113,65 @@ const ModernCV = () => {
           /* Mobile First Responsive Design */
           @media (max-width: 768px) {
             .main-nav {
-              padding: 1rem;
-              min-height: auto;
+              padding: 0.5rem 1rem;
+              min-height: 50px;
             }
 
             .nav-brand {
-              margin-bottom: 0.25rem;
-              text-align: center;
-              width: 100%;
+              font-size: 1.25rem;
+              margin-bottom: 0;
+              flex: 1;
+            }
+
+            .nav-toggle {
+              width: 36px;
+              height: 28px;
+              padding: 4px 8px;
             }
 
             .nav-links {
-              flex-direction: column;
+              flex-direction: row;
+              flex-wrap: wrap;
               align-items: center;
+              justify-content: center;
+              gap: 0.4rem;
+            }
+
+            .nav-links.open {
+              max-height: 120px;
+              padding-top: 0.5rem;
+              padding-bottom: 0.5rem;
             }
 
             .nav-link {
-              width: 100%;
-              max-width: 320px;
-              font-size: 0.9rem;
+              padding: 0.4rem 0.8rem;
+              font-size: 0.85rem;
+              border-radius: 20px;
+              flex: 0 0 auto;
             }
 
             .nav-actions {
               justify-content: center;
+              margin-top: 0.25rem;
             }
 
             .terminal-btn {
-              width: 100%;
-              max-width: 220px;
-              font-size: 0.85rem;
+              padding: 0.4rem 1rem;
+              font-size: 0.8rem;
+              border-radius: 20px;
             }
 
             section {
-              padding: 120px 1.25rem 60px;
+              padding: 80px 1.25rem 40px;
             }
 
             section + section {
-              padding-top: 60px;
+              padding-top: 40px;
             }
 
             .hero-section {
               min-height: auto;
+              padding-top: 100px;
             }
 
             .hero-content {

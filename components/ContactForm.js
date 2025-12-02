@@ -75,6 +75,7 @@ const ContactForm = ({ className = "" }) => {
           required
           disabled={isSubmitting}
           placeholder="Your full name"
+          autoComplete="name"
         />
       </div>
 
@@ -89,6 +90,7 @@ const ContactForm = ({ className = "" }) => {
           required
           disabled={isSubmitting}
           placeholder="your.email@example.com"
+          autoComplete="email"
         />
       </div>
 
