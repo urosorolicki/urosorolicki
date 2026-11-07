@@ -1,29 +1,45 @@
-## Hi, I'm Uroš
+<div align="center">
 
-Platform engineer from Belgrade. I work on Kubernetes, OpenShift and the infrastructure underneath them, and in my own time I build [FoldNine](https://siteops.foldnine.dev).
+![header](https://capsule-render.vercel.app/api?type=waving&height=170&color=0:0f172a,100:2563eb&text=Uro%C5%A1%20Orolicki&fontColor=ffffff&fontSize=42&fontAlignY=36&desc=Platform%20Engineer%20%C2%B7%20Belgrade%20%C2%B7%20Building%20SiteOps&descSize=16&descAlignY=58)
 
-I started as a developer (React, Java, C++, React Native) before moving into DevOps, so I'm comfortable on both sides of a deploy.
+</div>
 
-### What I'm building
+I'm a platform engineer working on Kubernetes, OpenShift and the infrastructure underneath them. I started as a developer (React, Java, C++, React Native), so I'm comfortable on both sides of a deploy.
 
-**[SiteOps](https://siteops.foldnine.dev)** is website monitoring for agencies that look after client sites. It checks uptime, SSL, DNS and APIs, keeps the evidence when something breaks, and separates what was measured from what's only a guess. Free during the beta, or try a quick check without an account: [siteops.foldnine.dev/check](https://siteops.foldnine.dev/check)
+In my own time I build [FoldNine](https://siteops.foldnine.dev), small tools for teams that look after other people's websites.
 
-### What I work with
+## SiteOps
 
-Infrastructure and platforms
+**Website monitoring for agencies.** You should hear about an outage before your client does.
 
-![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white) ![OpenShift](https://img.shields.io/badge/openshift-%23EE0000.svg?style=for-the-badge&logo=redhatopenshift&logoColor=white) ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white) ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) ![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white)
+- Checks uptime, response time, SSL, DNS, APIs and broken links for every client site
+- Opens an incident only after two failures in a row, confirmed from a second location
+- Keeps the evidence (status codes, headers, certificate, timings) and separates what was measured from what's only a guess
+- Alerts via email, Slack, Telegram or webhook, with read-only incident links and monthly reports for clients
 
-CI/CD and observability
+![Status](https://img.shields.io/badge/status-beta-2563eb?style=flat-square) ![Pricing](https://img.shields.io/badge/beta-free%20up%20to%2050%20sites-16a34a?style=flat-square)
 
-![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white) ![GitLab CI](https://img.shields.io/badge/gitlab%20CI-%23181717.svg?style=for-the-badge&logo=gitlab&logoColor=white) ![Jenkins](https://img.shields.io/badge/jenkins-%232C5263.svg?style=for-the-badge&logo=jenkins&logoColor=white) ![Grafana](https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white) ![Datadog](https://img.shields.io/badge/datadog-%23632CA6.svg?style=for-the-badge&logo=datadog&logoColor=white) ![Elasticsearch](https://img.shields.io/badge/elasticsearch-%230377CC.svg?style=for-the-badge&logo=elasticsearch&logoColor=white)
+[**Try a free site check**](https://siteops.foldnine.dev/check) (no account needed) · [siteops.foldnine.dev](https://siteops.foldnine.dev)
 
-Code and data
+## What I work with
 
-![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Bash](https://img.shields.io/badge/bash-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
+<p>
+  <img src="https://skillicons.dev/icons?i=kubernetes,aws,terraform,docker,linux,cloudflare,githubactions,gitlab,jenkins,grafana,prometheus&perline=11" alt="infrastructure stack" />
+</p>
+<p>
+  <img src="https://skillicons.dev/icons?i=ts,react,java,cpp,bash,postgres,redis&perline=11" alt="code stack" />
+</p>
 
-### Find me
+Plus OpenShift day to day, and Datadog and Elasticsearch on earlier projects.
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://linkedin.com/in/urosorolicki) [![Portfolio](https://img.shields.io/badge/Portfolio-000000?logo=vercel&logoColor=white)](https://urosorolicki.vercel.app) [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/urosorolicki)
+## Find me
 
-![GitHub stats](https://github-readme-stats.vercel.app/api?username=urosorolicki&theme=dark&hide_border=true&count_private=true)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/urosorolicki)
+[![Portfolio](https://img.shields.io/badge/Portfolio-111827?style=flat-square&logo=vercel&logoColor=white)](https://urosorolicki.vercel.app)
+[![SiteOps](https://img.shields.io/badge/SiteOps-2563eb?style=flat-square&logo=statuspage&logoColor=white)](https://siteops.foldnine.dev)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?style=flat-square&logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/urosorolicki)
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/urosorolicki/urosorolicki/output/snake-dark.svg">
+  <img alt="contribution graph snake" src="https://raw.githubusercontent.com/urosorolicki/urosorolicki/output/snake.svg">
+</picture>
