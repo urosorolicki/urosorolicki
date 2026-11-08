@@ -35,7 +35,7 @@ Plus OpenShift day to day, and Datadog and Elasticsearch on earlier projects.
 ## Find me
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/urosorolicki)
-[![Portfolio](https://img.shields.io/badge/Portfolio-111827?style=flat-square&logo=vercel&logoColor=white)](https://urosorolicki.vercel.app)
+[![Portfolio](https://img.shields.io/badge/Portfolio-111827?style=flat-square)](https://foldnine.dev/urosorolicki/)
 [![SiteOps](https://img.shields.io/badge/SiteOps-2563eb?style=flat-square&logo=statuspage&logoColor=white)](https://siteops.foldnine.dev)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?style=flat-square&logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/urosorolicki)
 
