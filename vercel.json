@@ -1,3 +1,7 @@
 {
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "redirects": [
+    { "source": "/", "destination": "https://foldnine.dev/urosorolicki/", "permanent": true },
+    { "source": "/:path*", "destination": "https://foldnine.dev/urosorolicki/", "permanent": true }
+  ]
 }
